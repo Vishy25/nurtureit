@@ -78,10 +78,7 @@ function AuditPage() {
                     {new Date(e.created_at).toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    {(e.profiles as { full_name: string | null; email: string | null } | null)
-                      ?.full_name ??
-                      (e.profiles as { email: string | null } | null)?.email ??
-                      "—"}
+                    {e.profiles?.full_name ?? e.profiles?.email ?? "—"}
                   </TableCell>
                   <TableCell className="font-medium">{e.action}</TableCell>
                   <TableCell className="text-muted-foreground">{e.entity_type ?? "—"}</TableCell>
