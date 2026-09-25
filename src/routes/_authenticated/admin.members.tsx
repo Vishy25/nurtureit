@@ -97,11 +97,15 @@ function MembersPage() {
   });
 
   const updateMember = useMutation({
-    mutationFn: async (patch: { id: string; role?: AppRole; status?: "active" | "deactivated" }) => {
-      const { error } = await supabase
-        .from("memberships")
-        .update({ role: patch.role, status: patch.status })
-        .eq("id", patch.id);
+    mutationFn: async (patch: {
+      id: string;
+      role?: AppRole | undefined;
+      status?: "active" | "deactivated" | undefined;
+    }) => {
+      const changes: { role?: AppRole; status?: "active" | "deactivated" } = {};
+      if (patch.role) changes.role = patch.role;
+      if (patch.status) changes.status = patch.status;
+      const { error } = await supabase.from("memberships").update(changes).eq("id", patch.id);
       if (error) throw error;
       await supabase.from("audit_events").insert({
         tenant_id: tenantId!,
