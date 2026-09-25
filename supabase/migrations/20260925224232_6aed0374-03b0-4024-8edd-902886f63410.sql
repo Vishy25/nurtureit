@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.ensure_profile() FROM PUBLIC, anon, authenticated;
