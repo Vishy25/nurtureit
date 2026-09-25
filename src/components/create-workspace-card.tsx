@@ -35,7 +35,10 @@ export function CreateWorkspaceCard({ compact = false }: { compact?: boolean }) 
       _is_demo: false,
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setName("");
     refresh();
     if (typeof data === "string") switchTenant(data);

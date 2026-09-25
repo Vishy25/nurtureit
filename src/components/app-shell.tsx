@@ -42,7 +42,7 @@ const NAV = [
   { to: "/admin", label: "Administration", icon: Settings },
 ] as const;
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavLinks({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <nav className="space-y-1 px-3">
@@ -69,7 +69,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarBody({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
   return (
     <div className="flex h-full flex-col bg-sidebar py-5">
       <div className="px-6 pb-6">
