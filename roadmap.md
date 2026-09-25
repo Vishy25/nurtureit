@@ -33,12 +33,23 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 - [ ] Deterministic explainable scoring engine (fit, intent, completeness, category) with history and overrides
 - [ ] Assignment rules + automatic follow-up task
 
-## Milestone 4 — Intelligence
+## Milestone 4 — Intelligence (agentic platform; starts only after M2 + M3 are reliable)
 
-- [ ] AI copilot (summaries, missing information, next actions, drafts, property matching, pipeline risks)
-- [ ] Review-before-send for external communications and high-risk actions
+Source: `docs/intelligence-brief.md`.
+
+- [ ] Orchestrator + agent registry (intake, qualification, matching, sales execution, deal health, sales intelligence), each with objective, allowed tools, permission scope, structured output, budget, timeout, retry and escalation rules
+- [ ] Deterministic workflows first; agent reasoning only for ambiguous steps
+- [ ] Tenant-isolated memory split: verified facts / interactions / approved knowledge / user preferences / agent hypotheses, with provenance, confidence, expiry; inspect, correct, delete
+- [ ] Outcome capture (qualification accept/reject, recommendation accept/edit/dismiss, stage moves, losses, revenue, corrections) linked to versioned rules, prompts, models
+- [ ] Improvement cycle: evaluation registry, offline eval vs baseline, approval, limited cohort, monitor, promote or roll back
+- [ ] Graduated autonomy per agent/action (start at levels 1–2); caps, stop conditions, pause + emergency stop; human approval for contracts, commercial terms, destructive actions, deal closure
+- [ ] Durable agent runs: persisted state, idempotent actions, attempted/completed/failed/uncertain tracking, reconciliation before retry, prompt-injection containment
+- [ ] Provider-independent model interface, per-task evaluation, fallback, per-tenant usage budgets
+- [ ] First end-to-end workflow: lead received → evidence evaluated → missing info → next action → human review → authorized execution → outcome captured
+- [ ] Acceptance evidence: traceability, blocked unauthorized tools, no cross-tenant memory, corrections influence later recommendations, eval-before-release, rollback, resume without duplicates
 - [ ] Workflow automation with execution history, retries, loop prevention, disable controls
 - [ ] Dashboards with documented metric definitions
+- [ ] Document external infrastructure needed (scheduled job runner, eval runs); no "self-learning" claims without validated results
 
 ## Milestone 5 — Configuration
 
