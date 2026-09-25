@@ -33,7 +33,10 @@ function WorkspacesPage() {
     setBusy(true);
     const { data, error } = await supabase.rpc("accept_invitation", { _token: token.trim() });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setToken("");
     refresh();
     if (typeof data === "string") switchTenant(data);

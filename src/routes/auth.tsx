@@ -56,7 +56,10 @@ function AuthPage() {
       },
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     if (data.session) void navigate({ to: "/dashboard" });
     else toast.success("Check your inbox to confirm your email address.");
   }
@@ -68,7 +71,8 @@ function AuthPage() {
     });
     if (result.error) {
       setBusy(false);
-      return toast.error("Google sign-in failed. Please try again.");
+      toast.error("Google sign-in failed. Please try again.");
+      return;
     }
     if (result.redirected) return;
     void navigate({ to: "/dashboard" });
