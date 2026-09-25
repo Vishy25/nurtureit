@@ -310,6 +310,7 @@ export type Database = {
         Args: { _industry?: string; _is_demo?: boolean; _name: string }
         Returns: string
       }
+      ensure_profile: { Args: never; Returns: undefined }
       has_tenant_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
