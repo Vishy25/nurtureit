@@ -74,6 +74,23 @@ function WorkspacesPage() {
               )}
             </div>
           ))}
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              const a = await supabase.rpc("seed_demo_tenant" as never, { _name: "Demo Harbour Realty" } as never);
+              const b = await supabase.rpc("seed_demo_tenant" as never, { _name: "Demo Summit Estates" } as never);
+              setBusy(false);
+              const err = a.error ?? b.error;
+              if (err) return void toast.error(err.message);
+              refresh();
+              toast.success("Two sample workspaces created with synthetic data.");
+            }}
+          >
+            Create two sample workspaces
+          </Button>
         </CardContent>
       </Card>
 
