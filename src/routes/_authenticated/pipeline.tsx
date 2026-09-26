@@ -133,7 +133,8 @@ function DealDetail({ deal, tenantId }: { deal: Deal; tenantId: string }) {
     mutationFn: async (args: { to_stage: Stage; to_state: State }) => {
       const { error } = await supabase.rpc("move_opportunity", {
         _id: deal.id, _to_stage: args.to_stage, _to_state: args.to_state,
-        _reason: reason.trim() || undefined, _follow_up: followUp || undefined,
+        ...(reason.trim() ? { _reason: reason.trim() } : {}),
+        ...(followUp ? { _follow_up: followUp } : {}),
       });
       if (error) throw error;
     },

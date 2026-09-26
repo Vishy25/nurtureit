@@ -139,8 +139,7 @@ function ContactsPage() {
 
 function Timeline({ tenantId, userId, target, canEdit }: { tenantId: string; userId: string; target: { type: "contact" | "org"; id: string }; canEdit: boolean }) {
   const qc = useQueryClient();
-  const col = target.type === "contact" ? "contact_id" : "organization_id";
-  const key = ["activities", col, target.id];
+  const key = ["activities", target.type, target.id];
   const [kind, setKind] = useState<(typeof KINDS)[number]>("note");
   const [summary, setSummary] = useState("");
   const { data = [] } = useQuery({
@@ -162,7 +161,7 @@ function Timeline({ tenantId, userId, target, canEdit }: { tenantId: string; use
   });
   const add = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("activities").insert({ tenant_id: tenantId, [col]: target.id, kind, summary: summary.trim(), created_by: userId });
+      const { error } = await supabase.from("activities").insert({ tenant_id: tenantId, contact_id: target.type === "contact" ? target.id : null, organization_id: target.type === "org" ? target.id : null, kind, summary: summary.trim(), created_by: userId });
       if (error) throw error;
     },
     onSuccess: () => { setSummary(""); void qc.invalidateQueries({ queryKey: key }); },
