@@ -247,7 +247,7 @@ function NewLeadDialog({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.full_name.trim()) return toast.error("Name is required");
+    if (!form.full_name.trim()) { toast.error("Name is required"); return; }
     setSaving(true);
     const { error } = await supabase.from("leads").insert({
       tenant_id: tenantId,
@@ -262,7 +262,7 @@ function NewLeadDialog({
       created_by: userId,
     });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Lead added");
     onDone();
   }
