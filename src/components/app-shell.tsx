@@ -36,6 +36,7 @@ const NAV = [
   { to: "/contacts", label: "Contacts", icon: Contact },
   { to: "/pipeline", label: "Pipeline", icon: KanbanSquare },
   { to: "/properties", label: "Properties", icon: Building2 },
+  { to: "/buyers", label: "Buyers & matching", icon: Contact },
   { to: "/tasks", label: "Tasks & calendar", icon: CalendarCheck },
   { to: "/reports", label: "Reports", icon: ChartNoAxesColumn },
   { to: "/integrations", label: "Integrations", icon: Plug },
