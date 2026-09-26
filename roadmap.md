@@ -22,7 +22,8 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 - [x] Opportunities + seven-stage pipeline with server-enforced transition rules and stage history
 - [x] Tasks and reminders (due dates, overdue view, assigned-to-me)
 - [ ] Attachments
-- [ ] Property catalog, buyer preferences, shortlists, site visits, offers
+- [x] Property catalog (type, area, bedrooms, price, status, amenities)
+- [ ] Buyer preferences, shortlists, site visits, offers
 - [x] Lead conversion preserving source attribution and history
 - [ ] Productivity: search, filters, saved views, bulk assignment, CSV import/export, duplicate review
 
