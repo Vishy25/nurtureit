@@ -25,7 +25,7 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 - [x] Property catalog (type, area, bedrooms, price, status, amenities)
 - [x] Buyer preferences, rule-based matching, shortlists, site visits, offers
 - [x] Lead conversion preserving source attribution and history
-- [ ] Productivity: search, filters, saved views, bulk assignment, CSV import/export, duplicate review
+- [x] Productivity: search, filters, saved views, bulk assignment, CSV import/export, duplicate review
 
 ## Milestone 3 — Agent intake
 
