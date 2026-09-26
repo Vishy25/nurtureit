@@ -11,8 +11,8 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 - [x] Tenant creation, invitation issue/accept, role change, deactivation, tenant switching
 - [x] Audit history view
 - [x] Primary navigation shell with all sections routed
-- [ ] Automated two-tenant isolation test evidence
-- [ ] Seeded synthetic demo data across two isolated tenants
+- [x] Two-tenant isolation test evidence (Sep 26 2026: workspace owner saw 3 leads / 2 deals; a second user saw 0 leads, 0 contacts, 0 deals; a non-member saw 0 across all tables)
+- [x] Synthetic demo data across two isolated tenants (Administration → Workspaces → "Create two sample workspaces")
 
 ## Milestone 2 — Core workflow
 
