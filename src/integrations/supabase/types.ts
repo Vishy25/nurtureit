@@ -14,6 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          created_by: string
+          id: string
+          kind: string
+          occurred_at: string
+          opportunity_id: string | null
+          organization_id: string | null
+          summary: string
+          tenant_id: string
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          kind?: string
+          occurred_at?: string
+          opportunity_id?: string | null
+          organization_id?: string | null
+          summary: string
+          tenant_id: string
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          kind?: string
+          occurred_at?: string
+          opportunity_id?: string | null
+          organization_id?: string | null
+          summary?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_events: {
         Row: {
           action: string
@@ -55,6 +123,75 @@ export type Database = {
           },
           {
             foreignKeyName: "audit_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          consent_source: string | null
+          created_at: string
+          created_by: string
+          email: string | null
+          full_name: string
+          id: string
+          marketing_consent: boolean
+          notes: string | null
+          organization_id: string | null
+          owner_id: string | null
+          phone: string | null
+          preferred_channel: string
+          tenant_id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          consent_source?: string | null
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          marketing_consent?: boolean
+          notes?: string | null
+          organization_id?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          preferred_channel?: string
+          tenant_id: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          consent_source?: string | null
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          marketing_consent?: boolean
+          notes?: string | null
+          organization_id?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          preferred_channel?: string
+          tenant_id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -212,6 +349,199 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      opportunities: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          expected_close: string | null
+          follow_up_at: string | null
+          id: string
+          lead_id: string | null
+          lost_reason: string | null
+          name: string
+          organization_id: string | null
+          owner_id: string | null
+          stage: Database["public"]["Enums"]["opp_stage"]
+          state: Database["public"]["Enums"]["opp_state"]
+          tenant_id: string
+          updated_at: string
+          value: number | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          expected_close?: string | null
+          follow_up_at?: string | null
+          id?: string
+          lead_id?: string | null
+          lost_reason?: string | null
+          name: string
+          organization_id?: string | null
+          owner_id?: string | null
+          stage?: Database["public"]["Enums"]["opp_stage"]
+          state?: Database["public"]["Enums"]["opp_state"]
+          tenant_id: string
+          updated_at?: string
+          value?: number | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          expected_close?: string | null
+          follow_up_at?: string | null
+          id?: string
+          lead_id?: string | null
+          lost_reason?: string | null
+          name?: string
+          organization_id?: string | null
+          owner_id?: string | null
+          stage?: Database["public"]["Enums"]["opp_stage"]
+          state?: Database["public"]["Enums"]["opp_state"]
+          tenant_id?: string
+          updated_at?: string
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunities_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      opportunity_stage_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          from_stage: Database["public"]["Enums"]["opp_stage"] | null
+          from_state: Database["public"]["Enums"]["opp_state"] | null
+          id: string
+          opportunity_id: string
+          reason: string | null
+          tenant_id: string
+          to_stage: Database["public"]["Enums"]["opp_stage"]
+          to_state: Database["public"]["Enums"]["opp_state"]
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          from_stage?: Database["public"]["Enums"]["opp_stage"] | null
+          from_state?: Database["public"]["Enums"]["opp_state"] | null
+          id?: string
+          opportunity_id: string
+          reason?: string | null
+          tenant_id: string
+          to_stage: Database["public"]["Enums"]["opp_stage"]
+          to_state: Database["public"]["Enums"]["opp_state"]
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          from_stage?: Database["public"]["Enums"]["opp_stage"] | null
+          from_state?: Database["public"]["Enums"]["opp_state"] | null
+          id?: string
+          opportunity_id?: string
+          reason?: string | null
+          tenant_id?: string
+          to_stage?: Database["public"]["Enums"]["opp_stage"]
+          to_state?: Database["public"]["Enums"]["opp_state"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunity_stage_history_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_stage_history_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          industry: string | null
+          name: string
+          notes: string | null
+          owner_id: string | null
+          phone: string | null
+          tenant_id: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          industry?: string | null
+          name: string
+          notes?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          tenant_id: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          industry?: string | null
+          name?: string
+          notes?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          tenant_id?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organizations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -385,6 +715,16 @@ export type Database = {
       }
       is_platform_admin: { Args: never; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
+      move_opportunity: {
+        Args: {
+          _follow_up?: string
+          _id: string
+          _reason?: string
+          _to_stage: Database["public"]["Enums"]["opp_stage"]
+          _to_state: Database["public"]["Enums"]["opp_state"]
+        }
+        Returns: undefined
+      }
       shares_tenant_with: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
@@ -401,6 +741,15 @@ export type Database = {
         | "disqualified"
         | "converted"
       membership_status: "active" | "invited" | "deactivated"
+      opp_stage:
+        | "qualification"
+        | "discovery"
+        | "shortlist"
+        | "site_visit"
+        | "negotiation"
+        | "closing"
+        | "closed_won"
+      opp_state: "open" | "on_hold" | "nurturing" | "won" | "lost"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -543,6 +892,16 @@ export const Constants = {
         "converted",
       ],
       membership_status: ["active", "invited", "deactivated"],
+      opp_stage: [
+        "qualification",
+        "discovery",
+        "shortlist",
+        "site_visit",
+        "negotiation",
+        "closing",
+        "closed_won",
+      ],
+      opp_state: ["open", "on_hold", "nurturing", "won", "lost"],
     },
   },
 } as const
