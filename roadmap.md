@@ -18,8 +18,8 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 
 - [x] Leads table + list/create/status change (source, score, owner, status, tags, next action, aging)
 - [ ] Lead detail, reassignment, qualification notes
-- [ ] Contacts and organizations with unified activity history
-- [ ] Opportunities + seven-stage pipeline with server-enforced transition rules and stage history
+- [x] Contacts and organizations with unified activity history
+- [x] Opportunities + seven-stage pipeline with server-enforced transition rules and stage history
 - [ ] Activities, tasks, reminders, attachments
 - [ ] Property catalog, buyer preferences, shortlists, site visits, offers
 - [ ] Lead conversion preserving source attribution and history
