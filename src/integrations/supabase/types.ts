@@ -588,6 +588,89 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          assignee_id: string | null
+          completed_at: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string
+          due_at: string | null
+          id: string
+          kind: string
+          lead_id: string | null
+          notes: string | null
+          opportunity_id: string | null
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          due_at?: string | null
+          id?: string
+          kind?: string
+          lead_id?: string | null
+          notes?: string | null
+          opportunity_id?: string | null
+          status?: string
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assignee_id?: string | null
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          due_at?: string | null
+          id?: string
+          kind?: string
+          lead_id?: string | null
+          notes?: string | null
+          opportunity_id?: string | null
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_members: {
         Row: {
           created_at: string
