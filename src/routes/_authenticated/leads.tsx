@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useTenant } from "@/lib/tenant-context";
 import { PageHeader } from "@/components/page-header";
 import { LeadDetail } from "@/components/lead-detail";
+import { ExportImport, BulkBar, duplicateIds, useMembers } from "@/components/leads-toolbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,7 +92,35 @@ function LeadsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const { data: members = [] } = useMembers(tenantId);
+  const dups = useMemo(() => duplicateIds(leads), [leads]);
+  const [dupOnly, setDupOnly] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const viewKey = `salesos.leadViews.${tenantId}`;
+  const [views, setViews] = useState<{ name: string; search: string; status: string; dupOnly: boolean }[]>([]);
+  useEffect(() => {
+    if (!tenantId) return;
+    try { setViews(JSON.parse(localStorage.getItem(viewKey) || "[]")); } catch { setViews([]); }
+  }, [tenantId, viewKey]);
+  function saveView() {
+    const name = window.prompt("Name this view");
+    if (!name?.trim()) return;
+    const next = [...views.filter((v) => v.name !== name.trim()), { name: name.trim(), search, status: statusFilter, dupOnly }];
+    setViews(next);
+    localStorage.setItem(viewKey, JSON.stringify(next));
+    toast.success("View saved");
+  }
+  const bulk = useMutation({
+    mutationFn: async (patch: { owner_id?: string; status?: Status }) => {
+      const { error } = await supabase.from("leads").update(patch).in("id", [...selected]);
+      if (error) throw error;
+    },
+    onSuccess: () => { setSelected(new Set()); toast.success("Leads updated"); void qc.invalidateQueries({ queryKey: ["leads", tenantId] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const filtered = leads.filter((l) => {
+    if (dupOnly && !dups.has(l.id)) return false;
     if (statusFilter !== "all" && l.status !== statusFilter) return false;
     const q = search.trim().toLowerCase();
     if (!q) return true;
@@ -104,8 +133,11 @@ function LeadsPage() {
         title="Leads"
         description="Every enquiry with its source, status, score, owner and next action."
         actions={
-          canCreate && tenantId && user ? (
-            <Dialog open={open} onOpenChange={setOpen}>
+          tenantId && user ? (
+            <div className="flex flex-wrap gap-2">
+            <ExportImport rows={filtered} tenantId={tenantId} userId={user.id} canImport={canCreate}
+              onImported={() => void qc.invalidateQueries({ queryKey: ["leads", tenantId] })} />
+            {canCreate && <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-1 size-4" /> New lead
@@ -119,7 +151,8 @@ function LeadsPage() {
                   void qc.invalidateQueries({ queryKey: ["leads", tenantId] });
                 }}
               />
-            </Dialog>
+            </Dialog>}
+            </div>
           ) : null
         }
       />
@@ -144,12 +177,32 @@ function LeadsPage() {
             ))}
           </SelectContent>
         </Select>
+        <Button variant={dupOnly ? "default" : "outline"} onClick={() => setDupOnly(!dupOnly)}>
+          Possible duplicates ({dups.size})
+        </Button>
+        {views.length > 0 && (
+          <Select value="" onValueChange={(n) => { const v = views.find((x) => x.name === n); if (v) { setSearch(v.search); setStatusFilter(v.status as "all" | Status); setDupOnly(v.dupOnly); } }}>
+            <SelectTrigger className="w-44"><SelectValue placeholder="Saved views" /></SelectTrigger>
+            <SelectContent>{views.map((v) => <SelectItem key={v.name} value={v.name}>{v.name}</SelectItem>)}</SelectContent>
+          </Select>
+        )}
+        <Button variant="ghost" onClick={saveView}>Save view</Button>
       </div>
+
+      {canCreate && (
+        <BulkBar count={selected.size} members={members} canAssign={allows("records.assign")} statuses={STATUSES}
+          onAssign={(id) => bulk.mutate({ owner_id: id })} onStatus={(s) => bulk.mutate({ status: s as Status })}
+          onClear={() => setSelected(new Set())} />
+      )}
 
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
         <table className="w-full text-sm">
           <thead className="border-b border-border text-left text-xs uppercase text-muted-foreground">
             <tr>
+              <th className="w-8 px-4 py-3">
+                <input type="checkbox" aria-label="Select all" checked={filtered.length > 0 && filtered.every((l) => selected.has(l.id))}
+                  onChange={(e) => setSelected(e.target.checked ? new Set(filtered.map((l) => l.id)) : new Set())} />
+              </th>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Source</th>
               <th className="px-4 py-3">Status</th>
@@ -161,14 +214,14 @@ function LeadsPage() {
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                   Loading…
                 </td>
               </tr>
             )}
             {!isLoading && filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                   No leads yet.
                 </td>
               </tr>
@@ -176,7 +229,12 @@ function LeadsPage() {
             {filtered.map((l) => (
               <tr key={l.id} className="border-b border-border last:border-0">
                 <td className="px-4 py-3">
+                  <input type="checkbox" aria-label={`Select ${l.full_name}`} checked={selected.has(l.id)}
+                    onChange={() => setSelected((prev) => { const n = new Set(prev); if (n.has(l.id)) n.delete(l.id); else n.add(l.id); return n; })} />
+                </td>
+                <td className="px-4 py-3">
                   <button type="button" onClick={() => setSelectedId(l.id)} className="font-medium text-primary hover:underline">{l.full_name}</button>
+                  {dups.has(l.id) && <Badge variant="destructive" className="ml-2 text-[10px]">Possible duplicate</Badge>}
                   <div className="text-xs text-muted-foreground">{l.email ?? l.phone ?? "—"}</div>
                   {l.tags.length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
