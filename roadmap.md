@@ -21,7 +21,7 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 - [x] Contacts and organizations with unified activity history
 - [x] Opportunities + seven-stage pipeline with server-enforced transition rules and stage history
 - [x] Tasks and reminders (due dates, overdue view, assigned-to-me)
-- [ ] Attachments
+- [x] Attachments
 - [x] Property catalog (type, area, bedrooms, price, status, amenities)
 - [x] Buyer preferences, rule-based matching, shortlists, site visits, offers
 - [x] Lead conversion preserving source attribution and history
@@ -29,12 +29,12 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 
 ## Milestone 3 — Agent intake
 
-- [ ] Versioned intake API + webhook with tenant-scoped credentials (rotation/revocation)
-- [ ] Payload validation, idempotency, replay protection, rate limits, correlation IDs
-- [ ] Ingestion event log, processing state, retry history, failed-event review queue
-- [ ] Normalization, in-tenant duplicate detection, provenance preservation
-- [ ] Deterministic explainable scoring engine (fit, intent, completeness, category) with history and overrides
-- [ ] Assignment rules + automatic follow-up task
+- [x] Versioned intake API + webhook with tenant-scoped credentials (rotation/revocation)
+- [x] Payload validation, idempotency, replay protection, rate limits, correlation IDs
+- [x] Ingestion event log, processing state, retry history, failed-event review queue
+- [x] Normalization, in-tenant duplicate detection, provenance preservation
+- [x] Deterministic explainable scoring engine (fit, intent, completeness, category) with history and overrides
+- [x] Assignment rules + automatic follow-up task
 
 ## Milestone 4 — Intelligence (agentic platform; starts only after M2 + M3 are reliable)
 
@@ -62,7 +62,7 @@ Source: `docs/intelligence-brief.md`.
 
 ## Milestone 5 — Configuration
 
-- [ ] Industry templates, terminology, typed custom fields, pipeline/stage configuration
+- [x] Industry templates, terminology, typed custom fields, pipeline/stage configuration
 - [ ] Scoring rules, assignment policies, task templates, notifications, trigger-condition-action workflows
 - [ ] Template versioning with safe stage mapping
 - [ ] Software-sales template working without code changes
@@ -74,6 +74,13 @@ Source: `docs/intelligence-brief.md`.
 - [ ] Pagination, tenant-aware indexes, bounded queries, load-test plan and measurements
 - [ ] Structured logs, error monitoring, job status, integration health, cost visibility
 - [ ] Environment, secrets, migration, backup/restore and deployment documentation
+
+## Decisions (Sep 2026)
+
+- AI autonomy chosen per workspace by admin; default suggest-only.
+- Incoming leads are manager-assigned (unassigned follow-up task created).
+- Templates: real estate, B2B services, software, SaaS, B2C products, staffing. Custom fields still open.
+- Attachments max 10 MB.
 
 ## Open assumptions (recorded, revisit if wrong)
 
