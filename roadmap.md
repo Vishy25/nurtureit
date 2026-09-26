@@ -22,7 +22,7 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 - [x] Opportunities + seven-stage pipeline with server-enforced transition rules and stage history
 - [ ] Activities, tasks, reminders, attachments
 - [ ] Property catalog, buyer preferences, shortlists, site visits, offers
-- [ ] Lead conversion preserving source attribution and history
+- [x] Lead conversion preserving source attribution and history
 - [ ] Productivity: search, filters, saved views, bulk assignment, CSV import/export, duplicate review
 
 ## Milestone 3 — Agent intake
