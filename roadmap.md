@@ -16,7 +16,8 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 
 ## Milestone 2 — Core workflow
 
-- [ ] Leads (source, qualification, score, owner, status, tags, next action, aging)
+- [x] Leads table + list/create/status change (source, score, owner, status, tags, next action, aging)
+- [ ] Lead detail, reassignment, qualification notes
 - [ ] Contacts and organizations with unified activity history
 - [ ] Opportunities + seven-stage pipeline with server-enforced transition rules and stage history
 - [ ] Activities, tasks, reminders, attachments
@@ -50,6 +51,12 @@ Source: `docs/intelligence-brief.md`.
 - [ ] Workflow automation with execution history, retries, loop prevention, disable controls
 - [ ] Dashboards with documented metric definitions
 - [ ] Document external infrastructure needed (scheduled job runner, eval runs); no "self-learning" claims without validated results
+
+## Milestone 4b — Executive dashboards & mobile
+
+- [ ] Role-based dashboards, targets, forecast snapshots, AI briefing citing sources
+- [ ] Mobile-friendly layouts, quick actions, installable web app, in-app notification centre
+- [ ] Later: offline notes/tasks/visit outcomes with sync; native store apps separately
 
 ## Milestone 5 — Configuration
 
