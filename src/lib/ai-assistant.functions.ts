@@ -130,7 +130,7 @@ export const analyzeLead = createServerFn({ method: "POST" })
 
     const started = Date.now();
     try {
-      const apiKey = process.env.LOVABLE_API_KEY;
+      const apiKey = process.env['LOVABLE_API_KEY'];
       if (!apiKey) throw new Error("AI is not configured.");
       const input = `Industry: ${tenant.industry}\n<lead_data>\n${JSON.stringify(lead)}\n</lead_data>\n<team_feedback>\n${(fb ?? []).map((f: any) => `- (${f.status}) ${f.feedback}`).join("\n") || "none"}\n</team_feedback>`;
       const out = await streamStructured(apiKey, input);
