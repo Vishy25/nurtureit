@@ -36,7 +36,9 @@ export function toCsv(rows: Lead[]) {
   return [COLS.join(","), ...rows.map((r) => COLS.map((c) => esc(r[c])).join(","))].join("\n");
 }
 
-export function parseCsv(text: string): Record<string, string>[] {
+type Row = { full_name?: string; name?: string; email?: string; phone?: string; source?: string; score?: string; tags?: string; next_action?: string };
+
+export function parseCsv(text: string): Row[] {
   const rows: string[][] = [];
   let row: string[] = [];
   let cur = "";
@@ -61,7 +63,7 @@ export function parseCsv(text: string): Record<string, string>[] {
   const [head, ...body] = rows;
   if (!head) return [];
   const keys = head.map((h) => h.trim().toLowerCase().replace(/\s+/g, "_"));
-  return body.map((r) => Object.fromEntries(keys.map((k, i) => [k, (r[i] ?? "").trim()])));
+  return body.map((r) => Object.fromEntries(keys.map((k, i) => [k, (r[i] ?? "").trim()])) as Row);
 }
 
 export function duplicateIds(leads: Lead[]) {
@@ -126,7 +128,7 @@ export function ExportImport({
       const score = r.score ? Number(r.score) : null;
       return {
         tenant_id: tenantId,
-        full_name: (r.full_name || r.name).slice(0, 200),
+        full_name: (r.full_name || r.name || "").slice(0, 200),
         email: r.email || null,
         phone: r.phone || null,
         source: r.source || "csv_import",
