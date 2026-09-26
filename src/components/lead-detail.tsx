@@ -85,12 +85,13 @@ export function LeadDetail({
   const doConvert = useMutation({
     mutationFn: async () => {
       if (!lead) return;
-      const { error } = await supabase.rpc("convert_lead", {
+      const args: { _lead_id: string; _deal_name: string; _value?: number; _expected_close?: string } = {
         _lead_id: lead.id,
         _deal_name: convert.name,
-        _value: convert.value ? Number(convert.value) : undefined,
-        _expected_close: convert.close || undefined,
-      });
+      };
+      if (convert.value) args._value = Number(convert.value);
+      if (convert.close) args._expected_close = convert.close;
+      const { error } = await supabase.rpc("convert_lead", args);
       if (error) throw error;
     },
     onSuccess: () => {

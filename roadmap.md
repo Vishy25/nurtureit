@@ -17,7 +17,7 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 ## Milestone 2 — Core workflow
 
 - [x] Leads table + list/create/status change (source, score, owner, status, tags, next action, aging)
-- [ ] Lead detail, reassignment, qualification notes
+- [x] Lead detail, reassignment, qualification notes, lead→contact+deal conversion
 - [x] Contacts and organizations with unified activity history
 - [x] Opportunities + seven-stage pipeline with server-enforced transition rules and stage history
 - [ ] Activities, tasks, reminders, attachments
