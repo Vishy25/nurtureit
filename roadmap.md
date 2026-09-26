@@ -20,7 +20,8 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 - [x] Lead detail, reassignment, qualification notes, lead→contact+deal conversion
 - [x] Contacts and organizations with unified activity history
 - [x] Opportunities + seven-stage pipeline with server-enforced transition rules and stage history
-- [ ] Activities, tasks, reminders, attachments
+- [x] Tasks and reminders (due dates, overdue view, assigned-to-me)
+- [ ] Attachments
 - [ ] Property catalog, buyer preferences, shortlists, site visits, offers
 - [x] Lead conversion preserving source attribution and history
 - [ ] Productivity: search, filters, saved views, bulk assignment, CSV import/export, duplicate review
