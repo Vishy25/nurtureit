@@ -146,7 +146,7 @@ Content-Type: application/json
               {events.map((e) => (
                 <div key={e.id} className="flex flex-wrap items-start justify-between gap-2 p-3 text-sm">
                   <div className="min-w-0">
-                    <div className="font-medium">{String((e.payload as Record<string, unknown>)?.full_name ?? "Unnamed")}</div>
+                    <div className="font-medium">{String((e.payload as Record<string, unknown>)?.["full_name"] ?? "Unnamed")}</div>
                     <div className="text-xs text-muted-foreground">{new Date(e.received_at).toLocaleString()} · attempts {e.attempts} · ref {e.correlation_id.slice(0, 8)}</div>
                     {e.error && <div className="mt-1 text-xs text-destructive">{e.error}</div>}
                   </div>

@@ -3,13 +3,13 @@
  * Weights: completeness 40, intent 35, fit 25.
  */
 export type ScoreInput = {
-  full_name?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  source?: string | null;
-  message?: string | null;
-  budget?: number | null;
-  timeline?: string | null;
+  full_name?: string | null | undefined;
+  email?: string | null | undefined;
+  phone?: string | null | undefined;
+  source?: string | null | undefined;
+  message?: string | null | undefined;
+  budget?: number | null | undefined;
+  timeline?: string | null | undefined;
 };
 
 export type ScoreBreakdown = {

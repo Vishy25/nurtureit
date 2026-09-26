@@ -25,6 +25,7 @@ import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminWorkspacesRouteImport } from './routes/_authenticated/admin.workspaces'
 import { Route as ApiPublicIntakeV1LeadsRouteImport } from './routes/api/public/intake/v1/leads'
 
@@ -109,6 +110,12 @@ const AuthenticatedAdminMembersRoute =
     path: '/members',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminWorkspacesRoute =
   AuthenticatedAdminWorkspacesRouteImport.update({
     id: '/workspaces',
@@ -136,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof AuthenticatedTasksRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
@@ -154,6 +162,7 @@ export interface FileRoutesByTo {
   '/tasks': typeof AuthenticatedTasksRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
@@ -175,6 +184,7 @@ export interface FileRoutesById {
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/admin/audit'
     | '/admin/members'
+    | '/admin/settings'
     | '/admin/workspaces'
     | '/admin/'
     | '/api/public/intake/v1/leads'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/admin/audit'
     | '/admin/members'
+    | '/admin/settings'
     | '/admin/workspaces'
     | '/admin'
     | '/api/public/intake/v1/leads'
@@ -234,6 +246,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tasks'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/members'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/workspaces'
     | '/_authenticated/admin/'
     | '/api/public/intake/v1/leads'
@@ -360,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMembersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/workspaces': {
       id: '/_authenticated/admin/workspaces'
       path: '/workspaces'
@@ -380,6 +400,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminWorkspacesRoute: typeof AuthenticatedAdminWorkspacesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -387,6 +408,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminWorkspacesRoute: AuthenticatedAdminWorkspacesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }

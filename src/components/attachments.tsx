@@ -50,7 +50,7 @@ export function Attachments({ tenantId, entityType, entityId, canUpload }: { ten
 
   async function open(path: string) {
     const { data, error } = await supabase.storage.from("attachments").createSignedUrl(path, 60);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     window.open(data.signedUrl, "_blank", "noopener");
   }
 
