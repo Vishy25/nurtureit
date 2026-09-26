@@ -30,6 +30,8 @@ import { useTenant } from "@/lib/tenant-context";
 import { ROLE_LABELS } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { getTemplate } from "@/lib/industry-templates";
+import { NotificationBell } from "@/components/notification-bell";
+import { QuickActions } from "@/components/quick-actions";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
@@ -149,6 +151,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
 
           <div className="ml-auto flex items-center gap-2">
+            {currentTenant && <NotificationBell tenantId={currentTenant.tenantId} />}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2">
@@ -173,7 +176,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-7xl flex-1 space-y-6 p-4 sm:p-6">{children}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1 space-y-6 p-4 pb-24 sm:p-6 lg:pb-6">{children}</main>
+        {currentTenant && <QuickActions />}
       </div>
     </div>
   );
