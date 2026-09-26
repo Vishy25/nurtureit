@@ -23,7 +23,7 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 - [x] Tasks and reminders (due dates, overdue view, assigned-to-me)
 - [ ] Attachments
 - [x] Property catalog (type, area, bedrooms, price, status, amenities)
-- [ ] Buyer preferences, shortlists, site visits, offers
+- [x] Buyer preferences, rule-based matching, shortlists, site visits, offers
 - [x] Lead conversion preserving source attribution and history
 - [ ] Productivity: search, filters, saved views, bulk assignment, CSV import/export, duplicate review
 
