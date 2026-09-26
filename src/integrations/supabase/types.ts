@@ -588,6 +588,71 @@ export type Database = {
         }
         Relationships: []
       }
+      properties: {
+        Row: {
+          amenities: string[]
+          area_sqft: number | null
+          bedrooms: number | null
+          created_at: string
+          created_by: string
+          currency: string
+          id: string
+          location: string | null
+          notes: string | null
+          price: number | null
+          project: string | null
+          property_type: string
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amenities?: string[]
+          area_sqft?: number | null
+          bedrooms?: number | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          price?: number | null
+          project?: string | null
+          property_type?: string
+          status?: string
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amenities?: string[]
+          area_sqft?: number | null
+          bedrooms?: number | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          price?: number | null
+          project?: string | null
+          property_type?: string
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "properties_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           assignee_id: string | null
