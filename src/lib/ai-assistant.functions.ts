@@ -102,7 +102,7 @@ export const analyzeLead = createServerFn({ method: "POST" })
     // RLS: only returns the lead if caller may see it
     const { data: lead } = await sb
       .from("leads")
-      .select("id, tenant_id, full_name, email, phone, company, source, status, score, tags, notes, next_action, created_at")
+      .select("id, tenant_id, full_name, email, phone, source, status, score, tags, notes, next_action, created_at")
       .eq("id", data.leadId)
       .maybeSingle();
     if (!lead) throw new Error("Lead not found");
