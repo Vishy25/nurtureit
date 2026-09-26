@@ -57,7 +57,7 @@ Source: `docs/intelligence-brief.md`.
 ## Milestone 4b — Executive dashboards & mobile
 
 - [ ] Role-based dashboards, targets, forecast snapshots, AI briefing citing sources
-- [ ] Mobile-friendly layouts, quick actions, installable web app, in-app notification centre
+- [x] Mobile-friendly layouts, quick actions, installable web app, in-app notification centre (lead/task assignment, incoming leads, AI suggestions)
 - [ ] Later: offline notes/tasks/visit outcomes with sync; native store apps separately
 
 ## Milestone 5 — Configuration
