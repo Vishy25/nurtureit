@@ -106,6 +106,71 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          created_at: string
+          created_by: string
+          email: string | null
+          full_name: string
+          id: string
+          next_action: string | null
+          next_action_at: string | null
+          notes: string | null
+          owner_id: string | null
+          phone: string | null
+          score: number | null
+          source: string
+          status: Database["public"]["Enums"]["lead_status"]
+          tags: string[]
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          next_action?: string | null
+          next_action_at?: string | null
+          notes?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          score?: number | null
+          source?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          tags?: string[]
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          next_action?: string | null
+          next_action_at?: string | null
+          notes?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          score?: number | null
+          source?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          tags?: string[]
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memberships: {
         Row: {
           created_at: string
@@ -329,6 +394,12 @@ export type Database = {
         | "sales_rep"
         | "ops_coordinator"
         | "analyst"
+      lead_status:
+        | "new"
+        | "accepted"
+        | "nurturing"
+        | "disqualified"
+        | "converted"
       membership_status: "active" | "invited" | "deactivated"
     }
     CompositeTypes: {
@@ -463,6 +534,13 @@ export const Constants = {
         "sales_rep",
         "ops_coordinator",
         "analyst",
+      ],
+      lead_status: [
+        "new",
+        "accepted",
+        "nurturing",
+        "disqualified",
+        "converted",
       ],
       membership_status: ["active", "invited", "deactivated"],
     },
