@@ -82,6 +82,143 @@ export type Database = {
           },
         ]
       }
+      ai_recommendations: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          feedback: string | null
+          id: string
+          lead_id: string | null
+          payload: Json
+          run_id: string
+          status: string
+          task_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          feedback?: string | null
+          id?: string
+          lead_id?: string | null
+          payload: Json
+          run_id: string
+          status?: string
+          task_id?: string | null
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          feedback?: string | null
+          id?: string
+          lead_id?: string | null
+          payload?: Json
+          run_id?: string
+          status?: string
+          task_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_recommendations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_recommendations_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "ai_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_recommendations_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_recommendations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_runs: {
+        Row: {
+          agent: string
+          created_at: string
+          created_by: string
+          duration_ms: number | null
+          error: string | null
+          finished_at: string | null
+          id: string
+          input_snapshot: Json
+          lead_id: string | null
+          model: string
+          output: Json | null
+          prompt_version: string
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          agent: string
+          created_at?: string
+          created_by?: string
+          duration_ms?: number | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          input_snapshot?: Json
+          lead_id?: string | null
+          model: string
+          output?: Json | null
+          prompt_version: string
+          status?: string
+          tenant_id: string
+        }
+        Update: {
+          agent?: string
+          created_at?: string
+          created_by?: string
+          duration_ms?: number | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          input_snapshot?: Json
+          lead_id?: string | null
+          model?: string
+          output?: Json | null
+          prompt_version?: string
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_runs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_runs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attachments: {
         Row: {
           content_type: string | null
@@ -1260,6 +1397,8 @@ export type Database = {
       tenants: {
         Row: {
           ai_autonomy: string
+          ai_daily_run_limit: number
+          ai_paused: boolean
           created_at: string
           created_by: string | null
           default_currency: string
@@ -1273,6 +1412,8 @@ export type Database = {
         }
         Insert: {
           ai_autonomy?: string
+          ai_daily_run_limit?: number
+          ai_paused?: boolean
           created_at?: string
           created_by?: string | null
           default_currency?: string
@@ -1286,6 +1427,8 @@ export type Database = {
         }
         Update: {
           ai_autonomy?: string
+          ai_daily_run_limit?: number
+          ai_paused?: boolean
           created_at?: string
           created_by?: string | null
           default_currency?: string
