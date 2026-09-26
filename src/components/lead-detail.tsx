@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Attachments } from "@/components/attachments";
+import { AiLeadAssistant } from "@/components/ai-lead-assistant";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Lead = Database["public"]["Tables"]["leads"]["Row"];
@@ -204,6 +205,9 @@ export function LeadDetail({
                 )}
               </div>
             )}
+            <div className="mt-6 border-t pt-4">
+              <AiLeadAssistant leadId={lead.id} tenantId={tenantId} canAct={canEdit} />
+            </div>
             <div className="mt-6 border-t pt-4">
               <Attachments tenantId={tenantId} entityType="lead" entityId={lead.id} canUpload={canEdit} />
             </div>

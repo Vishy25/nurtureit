@@ -16,3 +16,4 @@
 - UI permission checks come from `src/lib/permissions.ts` and tenant selection from `src/lib/tenant-context.tsx`; they are convenience layers on top of RLS, never the only guard.
 - Lead intake lives at `/api/public/intake/v1/leads`, authenticated by hashed per-workspace keys; processing shared in `src/lib/intake.server.ts` so retries reuse the same path. Why: one idempotent code path for live and replayed events.
 - Industry templates only relabel menus/stages (`src/lib/industry-templates.ts`); the underlying stage enum stays fixed. Why: safe switching without data migration.
+- AI calls run server-side in `src/lib/ai-assistant.functions.ts` under the caller's RLS session, with every run persisted in `ai_runs`. Why: traceability and tenant isolation for agent actions.
