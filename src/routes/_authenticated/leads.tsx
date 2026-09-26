@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useTenant } from "@/lib/tenant-context";
 import { PageHeader } from "@/components/page-header";
+import { LeadDetail } from "@/components/lead-detail";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,6 +65,7 @@ function LeadsPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | Status>("all");
   const [open, setOpen] = useState(false);
   const canCreate = allows("records.edit.own");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const { data: leads = [], isLoading } = useQuery({
     queryKey: ["leads", tenantId],
@@ -174,7 +176,7 @@ function LeadsPage() {
             {filtered.map((l) => (
               <tr key={l.id} className="border-b border-border last:border-0">
                 <td className="px-4 py-3">
-                  <div className="font-medium">{l.full_name}</div>
+                  <button type="button" onClick={() => setSelectedId(l.id)} className="font-medium text-primary hover:underline">{l.full_name}</button>
                   <div className="text-xs text-muted-foreground">{l.email ?? l.phone ?? "—"}</div>
                   {l.tags.length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
@@ -219,6 +221,15 @@ function LeadsPage() {
           </tbody>
         </table>
       </div>
+      {tenantId && (
+        <LeadDetail
+          lead={leads.find((l) => l.id === selectedId) ?? null}
+          tenantId={tenantId}
+          canEdit={canCreate}
+          canAssign={allows("records.assign")}
+          onClose={() => setSelectedId(null)}
+        />
+      )}
     </>
   );
 }
