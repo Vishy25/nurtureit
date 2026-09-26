@@ -1,3 +1,4 @@
+import { AiControls } from "@/components/ai-controls";
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

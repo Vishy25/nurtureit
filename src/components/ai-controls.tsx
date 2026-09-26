@@ -34,7 +34,7 @@ export function AiControls({ tenantId }: { tenantId: string }) {
   });
 
   const paused = data?.tenant?.ai_paused;
-  const c = data?.counts ?? {};
+  const c = (data?.counts ?? {}) as { pending?: number; accepted?: number; edited?: number; dismissed?: number };
   const decided = (c.accepted ?? 0) + (c.edited ?? 0) + (c.dismissed ?? 0);
   return (
     <Card>
