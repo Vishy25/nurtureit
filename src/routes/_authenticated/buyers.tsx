@@ -77,7 +77,8 @@ function BuyersPage() {
   const onError = (e: Error) => toast.error(e.message);
   const propName = (id: string) => properties.find((p) => p.id === id)?.title ?? "Property";
 
-  const [prefDraft, setPrefDraft] = useState<Record<string, string> | null>(null);
+  type PrefForm = { budget_min: string; budget_max: string; locations: string; property_types: string; min_bedrooms: string };
+  const [prefDraft, setPrefDraft] = useState<PrefForm | null>(null);
   const prefs = prefDraft ?? {
     budget_min: buyer?.prefs?.budget_min?.toString() ?? "",
     budget_max: buyer?.prefs?.budget_max?.toString() ?? "",
@@ -135,7 +136,7 @@ function BuyersPage() {
   });
   const update = useMutation({
     mutationFn: async ({ table, id, patch }: { table: "shortlists" | "site_visits" | "offers"; id: string; patch: Record<string, string | null> }) => {
-      const { error } = await supabase.from(table).update(patch).eq("id", id);
+      const { error } = await supabase.from(table).update(patch as never).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => void refresh(), onError,
