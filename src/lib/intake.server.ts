@@ -38,7 +38,7 @@ export async function processIntakeEvent(admin: Admin, eventId: string) {
         tenant_id: ev.tenant_id, kind: "note", created_by: ev.intake_credentials?.created_by,
         summary: `Repeat enquiry received via ${p.source} (correlation ${ev.correlation_id})`, occurred_at: new Date().toISOString(),
       }).then(() => null, () => null);
-      return { ...ev, status: "duplicate" };
+      return { ...ev, status: "duplicate", lead_id: dup[0].id };
     }
 
     const s = scoreLead({ ...p, email, phone });
