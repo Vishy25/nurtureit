@@ -7,6 +7,7 @@ const TABS = [
   { to: "/admin/members", label: "People & roles" },
   { to: "/admin/workspaces", label: "Workspaces" },
   { to: "/admin/audit", label: "Audit history" },
+  { to: "/admin/settings", label: "Workspace settings" },
 ] as const;
 
 export const Route = createFileRoute("/_authenticated/admin")({
