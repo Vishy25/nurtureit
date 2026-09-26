@@ -12,6 +12,7 @@ export type TenantMembership = {
   industry: string;
   isDemo: boolean;
   defaultCurrency: string;
+  aiAutonomy: string;
   role: AppRole;
 };
 
@@ -52,7 +53,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     queryFn: async (): Promise<TenantMembership[]> => {
       const { data, error } = await supabase
         .from("memberships")
-        .select("role, status, tenant_id, tenants(id, name, slug, industry, is_demo, default_currency)")
+        .select("role, status, tenant_id, tenants(id, name, slug, industry, is_demo, default_currency, ai_autonomy)")
         .eq("status", "active");
       if (error) throw error;
       return (data ?? [])
@@ -64,6 +65,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
           industry: row.tenants!.industry,
           isDemo: row.tenants!.is_demo,
           defaultCurrency: row.tenants!.default_currency,
+          aiAutonomy: row.tenants!.ai_autonomy,
           role: row.role as AppRole,
         }))
         .sort((a, b) => a.name.localeCompare(b.name));

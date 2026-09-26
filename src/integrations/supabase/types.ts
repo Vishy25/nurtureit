@@ -82,6 +82,53 @@ export type Database = {
           },
         ]
       }
+      attachments: {
+        Row: {
+          content_type: string | null
+          created_at: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          id: string
+          size_bytes: number
+          storage_path: string
+          tenant_id: string
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string
+          created_by?: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          id?: string
+          size_bytes: number
+          storage_path: string
+          tenant_id: string
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string
+          created_by?: string
+          entity_id?: string
+          entity_type?: string
+          file_name?: string
+          id?: string
+          size_bytes?: number
+          storage_path?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attachments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_events: {
         Row: {
           action: string
@@ -259,6 +306,120 @@ export type Database = {
           },
         ]
       }
+      intake_credentials: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          name: string
+          revoked_at: string | null
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          name: string
+          revoked_at?: string | null
+          status?: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          name?: string
+          revoked_at?: string | null
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_credentials_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intake_events: {
+        Row: {
+          attempts: number
+          correlation_id: string
+          credential_id: string | null
+          error: string | null
+          id: string
+          idempotency_key: string
+          lead_id: string | null
+          payload: Json
+          processed_at: string | null
+          received_at: string
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          attempts?: number
+          correlation_id: string
+          credential_id?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key: string
+          lead_id?: string | null
+          payload: Json
+          processed_at?: string | null
+          received_at?: string
+          status?: string
+          tenant_id: string
+        }
+        Update: {
+          attempts?: number
+          correlation_id?: string
+          credential_id?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key?: string
+          lead_id?: string | null
+          payload?: Json
+          processed_at?: string | null
+          received_at?: string
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_events_credential_id_fkey"
+            columns: ["credential_id"]
+            isOneToOne: false
+            referencedRelation: "intake_credentials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "intake_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           created_at: string
@@ -303,6 +464,57 @@ export type Database = {
           },
         ]
       }
+      lead_score_history: {
+        Row: {
+          breakdown: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          lead_id: string
+          reason: string | null
+          score: number
+          source: string
+          tenant_id: string
+        }
+        Insert: {
+          breakdown?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_id: string
+          reason?: string | null
+          score: number
+          source?: string
+          tenant_id: string
+        }
+        Update: {
+          breakdown?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_id?: string
+          reason?: string | null
+          score?: number
+          source?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_score_history_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_score_history_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           created_at: string
@@ -315,6 +527,7 @@ export type Database = {
           notes: string | null
           owner_id: string | null
           phone: string | null
+          provenance: Json
           score: number | null
           source: string
           status: Database["public"]["Enums"]["lead_status"]
@@ -333,6 +546,7 @@ export type Database = {
           notes?: string | null
           owner_id?: string | null
           phone?: string | null
+          provenance?: Json
           score?: number | null
           source?: string
           status?: Database["public"]["Enums"]["lead_status"]
@@ -351,6 +565,7 @@ export type Database = {
           notes?: string | null
           owner_id?: string | null
           phone?: string | null
+          provenance?: Json
           score?: number | null
           source?: string
           status?: Database["public"]["Enums"]["lead_status"]
@@ -1044,6 +1259,7 @@ export type Database = {
       }
       tenants: {
         Row: {
+          ai_autonomy: string
           created_at: string
           created_by: string | null
           default_currency: string
@@ -1056,6 +1272,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_autonomy?: string
           created_at?: string
           created_by?: string | null
           default_currency?: string
@@ -1068,6 +1285,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_autonomy?: string
           created_at?: string
           created_by?: string | null
           default_currency?: string

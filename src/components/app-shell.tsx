@@ -29,6 +29,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useTenant } from "@/lib/tenant-context";
 import { ROLE_LABELS } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
+import { getTemplate } from "@/lib/industry-templates";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: Home },
@@ -44,10 +45,13 @@ const NAV = [
 ] as const;
 
 function NavLinks({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
+  const { currentTenant } = useTenant();
+  const t = getTemplate(currentTenant?.industry);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <nav className="space-y-1 px-3">
-      {NAV.map(({ to, label, icon: Icon }) => {
+      {NAV.map(({ to, label: base, icon: Icon }) => {
+        const label = to === "/properties" ? t.terms.catalog : to === "/buyers" ? t.terms.buyers : base;
         const active = pathname === to || pathname.startsWith(`${to}/`);
         return (
           <Link
@@ -78,7 +82,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: (() => void) | undefined }) 
         <p className="text-xs text-sidebar-foreground/60">Lead to close, one workspace</p>
       </div>
       <NavLinks onNavigate={onNavigate} />
-      <div className="mt-auto px-6 pt-6 text-xs text-sidebar-foreground/50">Milestone 1 · Foundation</div>
+      <div className="mt-auto px-6 pt-6 text-xs text-sidebar-foreground/50">Lead to close</div>
     </div>
   );
 }
