@@ -128,6 +128,12 @@ function TasksPage() {
         title="Tasks and calendar"
         description="Follow-ups, reminders, site visits and appointments for you and your team."
       />
+      {(!online || pendingTasks.length > 0) && (
+        <div className="mb-4 rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground" role="status">
+          {!online ? "You're offline. New tasks and status changes are saved on this device. " : ""}
+          {pendingTasks.length > 0 ? `${pendingTasks.length} change(s) waiting to sync.` : ""}
+        </div>
+      )}
       {canCreate && (
         <form
           className="mb-6 flex flex-wrap gap-2 rounded-lg border bg-card p-4"
