@@ -8,6 +8,7 @@ import { useTenant } from "@/lib/tenant-context";
 import { AGENTS, RELEASE_STAGES, MEMORY_KINDS, EVAL_PASS_THRESHOLD, type ReleaseStage } from "@/lib/ai-registry";
 import { runEvaluation } from "@/lib/ai-assistant.functions";
 import { AiControls } from "@/components/ai-controls";
+import { AiOutcomes } from "@/components/ai-outcomes";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ function AiAdminPage() {
     <div className="space-y-4">
       <Registry tenantId={currentTenant.tenantId} isAdmin={isAdmin} isDemo={currentTenant.isDemo} />
       <Evaluations tenantId={currentTenant.tenantId} isAdmin={isAdmin} />
+      <AiOutcomes tenantId={currentTenant.tenantId} isAdmin={isAdmin} />
       <Memory tenantId={currentTenant.tenantId} />
       {isAdmin && <AiControls tenantId={currentTenant.tenantId} />}
     </div>
