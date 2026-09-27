@@ -75,20 +75,23 @@ function LeadsPage() {
   const { lead: leadParam } = Route.useSearch();
   useEffect(() => { if (leadParam) setSelectedId(leadParam); }, [leadParam]);
 
-  const { data: leads = [], isLoading } = useQuery({
-    queryKey: ["leads", tenantId],
+  const [pageLimit, setPageLimit] = useState(200);
+  const { data: leadPage, isLoading } = useQuery({
+    queryKey: ["leads", tenantId, pageLimit],
     enabled: !!tenantId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from("leads")
-        .select("*")
+        .select("*", { count: "exact" })
         .eq("tenant_id", tenantId!)
         .order("created_at", { ascending: false })
-        .limit(500);
+        .range(0, pageLimit - 1);
       if (error) throw error;
-      return data;
+      return { rows: data, total: count ?? data.length };
     },
   });
+  const leads = leadPage?.rows ?? [];
+  const totalLeads = leadPage?.total ?? 0;
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: Status }) => {
