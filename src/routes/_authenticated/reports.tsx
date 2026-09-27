@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/lib/tenant-context";
 import { useWorkspaceConfig } from "@/lib/workspace-config";
+import { AiBriefing } from "@/components/ai-briefing";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
@@ -112,6 +113,7 @@ function ReportsPage() {
       <PageHeader title="Reports & forecast" description={`Figures in ${currency}; deals in other currencies are excluded, not converted.`} />
       {!d ? <p className="text-sm text-muted-foreground">Loading…</p> : (
         <div className="grid gap-4 lg:grid-cols-2">
+          {canSnapshot && tenantId && <AiBriefing tenantId={tenantId} />}
           <Card>
             <CardHeader><CardTitle>This month vs target</CardTitle><CardDescription>{month.slice(0, 7)}</CardDescription></CardHeader>
             <CardContent className="space-y-4">
