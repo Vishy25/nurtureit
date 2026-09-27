@@ -55,6 +55,16 @@ BEGIN
   UPDATE public.tenants SET ai_paused = true WHERE id = a; GET DIAGNOSTICS n = ROW_COUNT;
   r := r || format(' | 7 emergency stop set=%s', n = 1);
 
+  -- 8. Outcome capture is tenant-isolated; interrupted-run retry claims are idempotent
+  SELECT count(*) INTO n FROM public.ai_recommendation_outcomes WHERE tenant_id = b;
+  r := r || format(' | 8 outcomes of B visible=%s', n);
+  INSERT INTO public.ai_runs(id, tenant_id, agent, prompt_version, model, status, input_snapshot, created_by, mode)
+  VALUES (gen_random_uuid(), a, 'lead_qualification', 'lead-qual-v2', 'test', 'uncertain', '{}', u, 'live') RETURNING id INTO d;
+  UPDATE public.ai_runs SET status = 'retried' WHERE id = d AND status = 'uncertain'; GET DIAGNOSTICS n = ROW_COUNT;
+  r := r || format(' first claim=%s', n);
+  UPDATE public.ai_runs SET status = 'retried' WHERE id = d AND status = 'uncertain'; GET DIAGNOSTICS n = ROW_COUNT;
+  r := r || format(' second claim=%s', n);
+
   RESET ROLE;
   RAISE EXCEPTION 'RESULT %', r;
 END $$;

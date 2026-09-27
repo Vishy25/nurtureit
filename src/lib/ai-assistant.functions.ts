@@ -25,8 +25,12 @@ async function gate(sb: any, tenantId: string) {
 export const analyzeLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ leadId: z.string().uuid() }).parse(d))
-  .handler(async ({ data, context }) => {
-    const sb = context.supabase as any;
+  .handler(async ({ data, context }) => analyzeLeadCore(context.supabase as any, context.userId, data.leadId));
+
+async function analyzeLeadCore(sb: any, userId: string, leadId: string, retryOf?: string) {
+  const context = { userId };
+  const data = { leadId };
+  {
     const { data: lead } = await sb.from("leads").select(LEAD_COLS).eq("id", data.leadId).maybeSingle(); // RLS-scoped
     if (!lead) throw new Error("Lead not found");
 
@@ -56,7 +60,7 @@ export const analyzeLead = createServerFn({ method: "POST" })
     const memory = await loadMemory(sb, lead.tenant_id, lead.id);
     const { data: run, error: runErr } = await sb.from("ai_runs").insert({
       tenant_id: lead.tenant_id, lead_id: lead.id, agent: LEAD_AGENT.id, prompt_version: LEAD_AGENT.promptVersion, model: LEAD_AGENT.model,
-      input_snapshot: { lead, memory_ids: memory.map((m) => m.id), release_stage: stage }, created_by: context.userId, mode: "live",
+      input_snapshot: { lead, memory_ids: memory.map((m) => m.id), release_stage: stage }, created_by: context.userId, mode: "live", retry_of: retryOf ?? null,
     }).select("id").single();
     if (runErr) throw new Error(runErr.message);
 
@@ -72,7 +76,8 @@ export const analyzeLead = createServerFn({ method: "POST" })
       await sb.from("ai_runs").update({ status: "failed", error: msg, duration_ms: Date.now() - started, finished_at: new Date().toISOString() }).eq("id", run.id);
       throw new Error(msg);
     }
-  });
+  }
+}
 
 /** Shadow evaluation: runs the agent on recent leads without creating suggestions, tasks or notifications. */
 export const runEvaluation = createServerFn({ method: "POST" })
@@ -114,4 +119,39 @@ export const runEvaluation = createServerFn({ method: "POST" })
     }).select("id").single();
     if (error) throw new Error(error.message);
     return { evaluationId: ev.id as string };
+  });
+
+/** Durable-run recovery: marks stale runs uncertain, then retries each uncertain lead run once (resuming saved results without a new AI call). */
+export const retryUncertainRuns = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ tenantId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: isAdmin } = await sb.rpc("has_tenant_role", { _tenant_id: data.tenantId, _roles: ["tenant_admin"] });
+    if (!isAdmin) throw new Error("Only workspace administrators can retry runs.");
+    const now = new Date().toISOString();
+    await sb.from("ai_runs").update({ status: "uncertain", error: "Interrupted before finishing", finished_at: now })
+      .eq("tenant_id", data.tenantId).eq("status", "running").lt("created_at", new Date(Date.now() - 180000).toISOString());
+    const { data: runs } = await sb.from("ai_runs").select("id, lead_id, output, ai_recommendations(id)")
+      .eq("tenant_id", data.tenantId).eq("status", "uncertain").eq("mode", "live").not("lead_id", "is", null)
+      .gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString()).limit(20);
+    let resumed = 0, retried = 0, failed = 0;
+    const seen = new Set<string>();
+    for (const r of runs ?? []) {
+      // Idempotent: claim the uncertain run first so parallel retries cannot both act on it.
+      const { data: claimed } = await sb.from("ai_runs").update({ status: "retried" }).eq("id", r.id).eq("status", "uncertain").select("id");
+      if (!claimed?.length || seen.has(r.lead_id)) continue;
+      seen.add(r.lead_id);
+      if ((r.ai_recommendations ?? []).length) continue; // already delivered — nothing to redo
+      if (r.output) {
+        const { error } = await sb.from("ai_recommendations").insert({ tenant_id: data.tenantId, run_id: r.id, lead_id: r.lead_id, payload: r.output });
+        error ? failed++ : resumed++;
+        continue;
+      }
+      try {
+        await analyzeLeadCore(sb, context.userId, r.lead_id, r.id);
+        retried++;
+      } catch { failed++; }
+    }
+    return { checked: runs?.length ?? 0, resumed, retried, failed };
   });
