@@ -33,7 +33,36 @@ const SOURCE_FIT: Record<string, number> = {
   cold: 5,
 };
 
-export function scoreLead(i: ScoreInput): ScoreBreakdown {
+/** Per-workspace scoring rules. Weights are the maximum points per factor; thresholds split hot/warm/cold. */
+export type ScoringConfig = {
+  weights: { name: number; email: number; phone: number; detail: number; budget: number; timeline: number; source: number };
+  sources: Record<string, number>; // 0–25 source fit before weighting
+  hot: number;
+  warm: number;
+};
+
+export const DEFAULT_SCORING: ScoringConfig = {
+  weights: { name: 10, email: 15, phone: 15, detail: 15, budget: 10, timeline: 10, source: 25 },
+  sources: SOURCE_FIT,
+  hot: 70,
+  warm: 40,
+};
+
+export function resolveScoring(raw: unknown): ScoringConfig {
+  const r = (raw ?? {}) as Partial<ScoringConfig>;
+  return {
+    weights: { ...DEFAULT_SCORING.weights, ...(r.weights ?? {}) },
+    sources: { ...DEFAULT_SCORING.sources, ...(r.sources ?? {}) },
+    hot: typeof r.hot === "number" ? r.hot : DEFAULT_SCORING.hot,
+    warm: typeof r.warm === "number" ? r.warm : DEFAULT_SCORING.warm,
+  };
+}
+
+const DEFAULT_MAX = { Name: 10, Email: 15, Phone: 15, "Enquiry detail": 15, Budget: 10, Timeline: 10, "Source fit": 25 } as const;
+const WEIGHT_KEY = { Name: "name", Email: "email", Phone: "phone", "Enquiry detail": "detail", Budget: "budget", Timeline: "timeline", "Source fit": "source" } as const;
+
+export function scoreLead(i: ScoreInput, config?: ScoringConfig | null): ScoreBreakdown {
+  const cfg = config ?? DEFAULT_SCORING;
   const parts: ScoreBreakdown["parts"] = [];
   const name = (i.full_name ?? "").trim();
   parts.push({ factor: "Name", points: name.split(/\s+/).length >= 2 ? 10 : name ? 5 : 0, max: 10, reason: name ? "Name provided" : "No name" });
@@ -49,12 +78,20 @@ export function scoreLead(i: ScoreInput): ScoreBreakdown {
   parts.push({ factor: "Timeline", points: tPts, max: 10, reason: t ? `Timeline: ${t}` : "No timeline" });
 
   const src = (i.source ?? "").toLowerCase();
-  const fit = SOURCE_FIT[src] ?? 8;
+  const fit = cfg.sources[src] ?? 8;
   parts.push({ factor: "Source fit", points: fit, max: 25, reason: `Source "${src || "unknown"}"` });
 
-  const total = Math.min(100, parts.reduce((s, p) => s + p.points, 0));
-  const category = total >= 70 ? "hot" : total >= 40 ? "warm" : "cold";
-  return { total, category, parts, version: SCORING_VERSION };
+  // Apply workspace weights, then normalise to 0–100
+  for (const p of parts) {
+    const f = p.factor as keyof typeof DEFAULT_MAX;
+    const w = Math.max(0, cfg.weights[WEIGHT_KEY[f]]);
+    p.points = Math.round((p.points / DEFAULT_MAX[f]) * w);
+    p.max = w;
+  }
+  const maxSum = parts.reduce((s, p) => s + p.max, 0) || 1;
+  const total = Math.min(100, Math.round((parts.reduce((s, p) => s + p.points, 0) / maxSum) * 100));
+  const category = total >= cfg.hot ? "hot" : total >= cfg.warm ? "warm" : "cold";
+  return { total, category, parts, version: config ? `${SCORING_VERSION}-custom` : SCORING_VERSION };
 }
 
 export function normalizeEmail(e?: string | null) {
