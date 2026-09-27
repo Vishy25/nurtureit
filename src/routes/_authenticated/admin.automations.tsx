@@ -68,9 +68,9 @@ function AutomationsPage() {
   async function create() {
     if (!name.trim()) { toast.error("Name is required"); return; }
     const condition: Record<string, unknown> = {};
-    if (trigger === "lead.created" && source.trim()) condition.source = source.trim();
-    if (trigger === "lead.created" && minScore) condition.min_score = Number(minScore);
-    if (trigger === "opportunity.stage_changed" && toStage !== "any") condition.to_stage = toStage;
+    if (trigger === "lead.created" && source.trim()) condition["source"] = source.trim();
+    if (trigger === "lead.created" && minScore) condition["min_score"] = Number(minScore);
+    if (trigger === "opportunity.stage_changed" && toStage !== "any") condition["to_stage"] = toStage;
     const action_config = action === "create_task" ? { title: title.trim() || name.trim(), due_days: Number(dueDays || 1) } : {};
     const { error } = await supabase.from("automation_rules").insert({ tenant_id: tenantId!, name: name.trim(), trigger_event: trigger, condition: condition as never, action, action_config: action_config as never });
     if (error) { toast.error(error.message); return; }
