@@ -28,6 +28,7 @@ import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAutomationsRouteImport } from './routes/_authenticated/admin.automations'
 import { Route as AuthenticatedAdminCustomizeRouteImport } from './routes/_authenticated/admin.customize'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
+import { Route as AuthenticatedAdminMonitoringRouteImport } from './routes/_authenticated/admin.monitoring'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminWorkspacesRouteImport } from './routes/_authenticated/admin.workspaces'
 import { Route as ApiPublicIntakeV1LeadsRouteImport } from './routes/api/public/intake/v1/leads'
@@ -130,6 +131,12 @@ const AuthenticatedAdminMembersRoute =
     path: '/members',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminMonitoringRoute =
+  AuthenticatedAdminMonitoringRouteImport.update({
+    id: '/monitoring',
+    path: '/monitoring',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
     id: '/settings',
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/admin/automations': typeof AuthenticatedAdminAutomationsRoute
   '/admin/customize': typeof AuthenticatedAdminCustomizeRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
+  '/admin/monitoring': typeof AuthenticatedAdminMonitoringRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -188,6 +196,7 @@ export interface FileRoutesByTo {
   '/admin/automations': typeof AuthenticatedAdminAutomationsRoute
   '/admin/customize': typeof AuthenticatedAdminCustomizeRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
+  '/admin/monitoring': typeof AuthenticatedAdminMonitoringRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -213,6 +222,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/automations': typeof AuthenticatedAdminAutomationsRoute
   '/_authenticated/admin/customize': typeof AuthenticatedAdminCustomizeRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
+  '/_authenticated/admin/monitoring': typeof AuthenticatedAdminMonitoringRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/admin/automations'
     | '/admin/customize'
     | '/admin/members'
+    | '/admin/monitoring'
     | '/admin/settings'
     | '/admin/workspaces'
     | '/admin/'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/admin/automations'
     | '/admin/customize'
     | '/admin/members'
+    | '/admin/monitoring'
     | '/admin/settings'
     | '/admin/workspaces'
     | '/admin'
@@ -284,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/automations'
     | '/_authenticated/admin/customize'
     | '/_authenticated/admin/members'
+    | '/_authenticated/admin/monitoring'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/workspaces'
     | '/_authenticated/admin/'
@@ -432,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMembersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/monitoring': {
+      id: '/_authenticated/admin/monitoring'
+      path: '/monitoring'
+      fullPath: '/admin/monitoring'
+      preLoaderRoute: typeof AuthenticatedAdminMonitoringRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/settings': {
       id: '/_authenticated/admin/settings'
       path: '/settings'
@@ -462,6 +482,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAutomationsRoute: typeof AuthenticatedAdminAutomationsRoute
   AuthenticatedAdminCustomizeRoute: typeof AuthenticatedAdminCustomizeRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
+  AuthenticatedAdminMonitoringRoute: typeof AuthenticatedAdminMonitoringRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminWorkspacesRoute: typeof AuthenticatedAdminWorkspacesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -473,6 +494,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAutomationsRoute: AuthenticatedAdminAutomationsRoute,
   AuthenticatedAdminCustomizeRoute: AuthenticatedAdminCustomizeRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
+  AuthenticatedAdminMonitoringRoute: AuthenticatedAdminMonitoringRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminWorkspacesRoute: AuthenticatedAdminWorkspacesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,

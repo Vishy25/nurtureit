@@ -58,13 +58,13 @@ Source: `docs/intelligence-brief.md`.
 
 - [~] Role-based dashboards, targets, forecast snapshots (done; Reports page) — AI briefing citing sources pending
 - [x] Mobile-friendly layouts, quick actions, installable web app, in-app notification centre (lead/task assignment, incoming leads, AI suggestions)
-- [ ] Later: offline notes/tasks/visit outcomes with sync; native store apps separately
+- [x] (notes only) Later: offline notes/tasks/visit outcomes with sync; native store apps separately
 
 ## Milestone 5 — Configuration
 
 - [x] Industry templates, terminology, typed custom fields, pipeline/stage configuration
 - [x] Scoring rules, assignment policy (least-loaded rep, opt-in), task templates, trigger-condition-action workflows with notifications
-- [ ] Template versioning with safe stage mapping
+- [x] Template versioning with safe stage mapping
 - [x] Software-sales template working without code changes (select in Settings)
 - [x] Starter templates: book sales, agriculture produce, retreat sales, senior living
 
@@ -72,7 +72,7 @@ Source: `docs/intelligence-brief.md`.
 
 - [ ] End-to-end verification of the acceptance criteria
 - [~] Tenant-aware indexes, bounded queries, load-test plan done (docs/operations.md); pagination + measurements pending
-- [ ] Structured logs, error monitoring, job status, integration health, cost visibility
+- [x] (partial) Structured logs, error monitoring, job status, integration health, cost visibility
 - [x] Environment, secrets, migration, backup/restore and deployment documentation (docs/operations.md)
 
 ## Decisions (Sep 2026)

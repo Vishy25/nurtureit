@@ -31,6 +31,7 @@ import { ROLE_LABELS } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { getTemplate } from "@/lib/industry-templates";
 import { NotificationBell } from "@/components/notification-bell";
+import { ErrorReporter, OfflineBadge } from "@/components/error-reporter";
 import { QuickActions } from "@/components/quick-actions";
 
 const NAV = [
@@ -151,6 +152,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
 
           <div className="ml-auto flex items-center gap-2">
+            <ErrorReporter tenantId={currentTenant?.tenantId ?? null} />
+            <OfflineBadge />
             {currentTenant && <NotificationBell tenantId={currentTenant.tenantId} />}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

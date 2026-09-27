@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { queueNote, useOfflineQueue } from "@/lib/offline-queue";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -162,12 +163,21 @@ function Timeline({ tenantId, userId, target, canEdit }: { tenantId: string; use
       return data;
     },
   });
+  const { pending } = useOfflineQueue();
+  const queued = pending.filter((n) => (target.type === "contact" ? n.contact_id : n.organization_id) === target.id);
+  useEffect(() => { if (queued.length === 0) void qc.invalidateQueries({ queryKey: key }); }, [queued.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const add = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("activities").insert({ tenant_id: tenantId, contact_id: target.type === "contact" ? target.id : null, organization_id: target.type === "org" ? target.id : null, kind, summary: summary.trim(), created_by: userId });
-      if (error) throw error;
+      const row = { tenant_id: tenantId, contact_id: target.type === "contact" ? target.id : null, organization_id: target.type === "org" ? target.id : null, kind, summary: summary.trim(), created_by: userId };
+      if (!navigator.onLine) { queueNote(row); return "queued"; }
+      const { error } = await supabase.from("activities").insert(row);
+      if (error) {
+        if (error.message.toLowerCase().includes("fetch")) { queueNote(row); return "queued"; }
+        throw error;
+      }
+      return "saved";
     },
-    onSuccess: () => { setSummary(""); void qc.invalidateQueries({ queryKey: key }); },
+    onSuccess: (r) => { setSummary(""); if (r === "queued") toast.info("You're offline — note saved on this device and will sync automatically."); void qc.invalidateQueries({ queryKey: key }); },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
@@ -185,6 +195,15 @@ function Timeline({ tenantId, userId, target, canEdit }: { tenantId: string; use
         </form>
       )}
       <ol className="space-y-3">
+        {queued.map((a) => (
+          <li key={a.id} className="rounded-md border border-dashed border-border p-3">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <Badge variant="outline" className="capitalize">{a.kind} · waiting to sync</Badge>
+              <span>{new Date(a.occurred_at).toLocaleString()}</span>
+            </div>
+            <p className="mt-2 text-sm">{a.summary}</p>
+          </li>
+        ))}
         {data.map((a) => (
           <li key={a.id} className="rounded-md border border-border p-3">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -194,7 +213,7 @@ function Timeline({ tenantId, userId, target, canEdit }: { tenantId: string; use
             <p className="mt-2 text-sm">{a.summary}</p>
           </li>
         ))}
-        {data.length === 0 && <p className="text-sm text-muted-foreground">No activity recorded yet.</p>}
+        {data.length === 0 && queued.length === 0 && <p className="text-sm text-muted-foreground">No activity recorded yet.</p>}
       </ol>
     </div>
   );
