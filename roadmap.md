@@ -88,3 +88,10 @@ Source: `docs/intelligence-brief.md`.
 - Invitation delivery by email is not connected; codes are shared manually until an email provider is configured.
 - Platform administrators are granted by inserting into `platform_admins`; no self-service path.
 - Default currency per tenant is USD; no cross-currency conversion policy yet.
+
+## Current request (Sep 27)
+- [ ] AI agent registry, tenant-isolated memory, evaluation + release cycle (shadow → pilot → live)
+- [ ] AI suggestions in alert bell, opening the lead panel to act
+- [ ] Custom lead fields; per-workspace stage labels and scoring rules
+- [ ] Two-workspace isolation test with demo data (leads, contacts, tasks)
+- [ ] Role-based dashboards: leads, conversions, pipeline stages, tasks, property activity

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { scoreLead, normalizeEmail, normalizePhone } from "./scoring";
+import { scoreLead, resolveScoring, normalizeEmail, normalizePhone } from "./scoring";
 
 export const IntakePayload = z.object({
   full_name: z.string().trim().min(1).max(200),
@@ -41,7 +41,8 @@ export async function processIntakeEvent(admin: Admin, eventId: string) {
       return { ...ev, status: "duplicate", lead_id: dup[0].id };
     }
 
-    const s = scoreLead({ ...p, email, phone });
+    const { data: tcfg } = await admin.from("tenants").select("scoring_config").eq("id", ev.tenant_id).maybeSingle();
+    const s = scoreLead({ ...p, email, phone }, tcfg?.scoring_config ? resolveScoring(tcfg.scoring_config) : null);
     const createdBy = ev.intake_credentials?.created_by;
     if (!createdBy) throw new Error("Credential owner missing");
     const { data: lead, error: le } = await admin.from("leads").insert({

@@ -23,7 +23,9 @@ import { Route as AuthenticatedPropertiesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAiRouteImport } from './routes/_authenticated/admin.ai'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
+import { Route as AuthenticatedAdminCustomizeRouteImport } from './routes/_authenticated/admin.customize'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminWorkspacesRouteImport } from './routes/_authenticated/admin.workspaces'
@@ -99,11 +101,22 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminAiRoute = AuthenticatedAdminAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminCustomizeRoute =
+  AuthenticatedAdminCustomizeRouteImport.update({
+    id: '/customize',
+    path: '/customize',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminMembersRoute =
   AuthenticatedAdminMembersRouteImport.update({
     id: '/members',
@@ -141,7 +154,9 @@ export interface FileRoutesByFullPath {
   '/properties': typeof AuthenticatedPropertiesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/tasks': typeof AuthenticatedTasksRoute
+  '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/customize': typeof AuthenticatedAdminCustomizeRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
@@ -160,7 +175,9 @@ export interface FileRoutesByTo {
   '/properties': typeof AuthenticatedPropertiesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/tasks': typeof AuthenticatedTasksRoute
+  '/admin/ai': typeof AuthenticatedAdminAiRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/customize': typeof AuthenticatedAdminCustomizeRoute
   '/admin/members': typeof AuthenticatedAdminMembersRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
@@ -182,7 +199,9 @@ export interface FileRoutesById {
   '/_authenticated/properties': typeof AuthenticatedPropertiesRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
+  '/_authenticated/admin/ai': typeof AuthenticatedAdminAiRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/customize': typeof AuthenticatedAdminCustomizeRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
@@ -204,7 +223,9 @@ export interface FileRouteTypes {
     | '/properties'
     | '/reports'
     | '/tasks'
+    | '/admin/ai'
     | '/admin/audit'
+    | '/admin/customize'
     | '/admin/members'
     | '/admin/settings'
     | '/admin/workspaces'
@@ -223,7 +244,9 @@ export interface FileRouteTypes {
     | '/properties'
     | '/reports'
     | '/tasks'
+    | '/admin/ai'
     | '/admin/audit'
+    | '/admin/customize'
     | '/admin/members'
     | '/admin/settings'
     | '/admin/workspaces'
@@ -244,7 +267,9 @@ export interface FileRouteTypes {
     | '/_authenticated/properties'
     | '/_authenticated/reports'
     | '/_authenticated/tasks'
+    | '/_authenticated/admin/ai'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/customize'
     | '/_authenticated/admin/members'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/workspaces'
@@ -359,11 +384,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/ai': {
+      id: '/_authenticated/admin/ai'
+      path: '/ai'
+      fullPath: '/admin/ai'
+      preLoaderRoute: typeof AuthenticatedAdminAiRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/audit': {
       id: '/_authenticated/admin/audit'
       path: '/audit'
       fullPath: '/admin/audit'
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/customize': {
+      id: '/_authenticated/admin/customize'
+      path: '/customize'
+      fullPath: '/admin/customize'
+      preLoaderRoute: typeof AuthenticatedAdminCustomizeRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/members': {
@@ -398,7 +437,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAiRoute: typeof AuthenticatedAdminAiRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminCustomizeRoute: typeof AuthenticatedAdminCustomizeRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminWorkspacesRoute: typeof AuthenticatedAdminWorkspacesRoute
@@ -406,7 +447,9 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAiRoute: AuthenticatedAdminAiRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminCustomizeRoute: AuthenticatedAdminCustomizeRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminWorkspacesRoute: AuthenticatedAdminWorkspacesRoute,

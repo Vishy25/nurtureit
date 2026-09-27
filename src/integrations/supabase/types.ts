@@ -82,6 +82,154 @@ export type Database = {
           },
         ]
       }
+      ai_agent_settings: {
+        Row: {
+          agent: string
+          enabled: boolean
+          id: string
+          prompt_version: string
+          release_stage: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          agent: string
+          enabled?: boolean
+          id?: string
+          prompt_version: string
+          release_stage?: string
+          tenant_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          agent?: string
+          enabled?: boolean
+          id?: string
+          prompt_version?: string
+          release_stage?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_agent_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_evaluations: {
+        Row: {
+          agent: string
+          created_at: string
+          created_by: string
+          id: string
+          model: string
+          pass_rate: number | null
+          prompt_version: string
+          results: Json
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          agent: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          model: string
+          pass_rate?: number | null
+          prompt_version: string
+          results?: Json
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tenant_id: string
+        }
+        Update: {
+          agent?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          model?: string
+          pass_rate?: number | null
+          prompt_version?: string
+          results?: Json
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_evaluations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_memory: {
+        Row: {
+          confidence: number
+          content: string
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          kind: string
+          lead_id: string | null
+          source: string
+          tenant_id: string
+        }
+        Insert: {
+          confidence?: number
+          content: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          kind: string
+          lead_id?: string | null
+          source?: string
+          tenant_id: string
+        }
+        Update: {
+          confidence?: number
+          content?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          kind?: string
+          lead_id?: string | null
+          source?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_memory_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_memory_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_recommendations: {
         Row: {
           created_at: string
@@ -164,6 +312,7 @@ export type Database = {
           id: string
           input_snapshot: Json
           lead_id: string | null
+          mode: string
           model: string
           output: Json | null
           prompt_version: string
@@ -180,6 +329,7 @@ export type Database = {
           id?: string
           input_snapshot?: Json
           lead_id?: string | null
+          mode?: string
           model: string
           output?: Json | null
           prompt_version: string
@@ -196,6 +346,7 @@ export type Database = {
           id?: string
           input_snapshot?: Json
           lead_id?: string | null
+          mode?: string
           model?: string
           output?: Json | null
           prompt_version?: string
@@ -443,6 +594,53 @@ export type Database = {
           },
         ]
       }
+      custom_field_defs: {
+        Row: {
+          created_at: string
+          entity: string
+          field_key: string
+          field_type: string
+          id: string
+          label: string
+          options: string[]
+          position: number
+          required: boolean
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity?: string
+          field_key: string
+          field_type: string
+          id?: string
+          label: string
+          options?: string[]
+          position?: number
+          required?: boolean
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          entity?: string
+          field_key?: string
+          field_type?: string
+          id?: string
+          label?: string
+          options?: string[]
+          position?: number
+          required?: boolean
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_field_defs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       intake_credentials: {
         Row: {
           created_at: string
@@ -656,6 +854,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          custom_fields: Json
           email: string | null
           full_name: string
           id: string
@@ -675,6 +874,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string
+          custom_fields?: Json
           email?: string | null
           full_name: string
           id?: string
@@ -694,6 +894,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          custom_fields?: Json
           email?: string | null
           full_name?: string
           id?: string
@@ -1450,7 +1651,9 @@ export type Database = {
           industry: string
           is_demo: boolean
           name: string
+          scoring_config: Json | null
           slug: string
+          stage_labels: string[] | null
           status: string
           updated_at: string
         }
@@ -1465,7 +1668,9 @@ export type Database = {
           industry?: string
           is_demo?: boolean
           name: string
+          scoring_config?: Json | null
           slug: string
+          stage_labels?: string[] | null
           status?: string
           updated_at?: string
         }
@@ -1480,7 +1685,9 @@ export type Database = {
           industry?: string
           is_demo?: boolean
           name?: string
+          scoring_config?: Json | null
           slug?: string
+          stage_labels?: string[] | null
           status?: string
           updated_at?: string
         }
