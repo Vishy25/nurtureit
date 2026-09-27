@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/lib/tenant-context";
 import { useAuth } from "@/lib/auth-context";
 import { PageHeader } from "@/components/page-header";
+import { queueOp, isOffline, useOfflineQueue } from "@/lib/offline-queue";
 
 export const Route = createFileRoute("/_authenticated/buyers")({
   head: () => ({
@@ -32,6 +33,7 @@ type Property = {
 };
 
 function BuyersPage() {
+  const { ops: offlineOps } = useOfflineQueue();
   const { currentTenant, role } = useTenant();
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -136,19 +138,24 @@ function BuyersPage() {
   });
   const update = useMutation({
     mutationFn: async ({ table, id, patch }: { table: "shortlists" | "site_visits" | "offers"; id: string; patch: Record<string, string | null> }) => {
+      if (table === "site_visits" && isOffline()) { queueOp({ table, op: "update", target_id: id, row: patch }); return "queued"; }
       const { error } = await supabase.from(table).update(patch as never).eq("id", id);
       if (error) throw error;
+      return "saved";
     },
-    onSuccess: () => void refresh(), onError,
+    onSuccess: (r) => { if (r === "queued") toast.info("Offline — visit update saved on this device and will sync automatically."); void refresh(); }, onError,
   });
 
   const [visit, setVisit] = useState({ property_id: "", scheduled_at: "" });
   const addVisit = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("site_visits").insert({ tenant_id: tenantId!, contact_id: contactId, property_id: visit.property_id, scheduled_at: new Date(visit.scheduled_at).toISOString(), created_by: user!.id });
+      const row = { tenant_id: tenantId!, contact_id: contactId, property_id: visit.property_id, scheduled_at: new Date(visit.scheduled_at).toISOString(), created_by: user!.id };
+      if (isOffline()) { queueOp({ table: "site_visits", op: "insert", row }); return "queued"; }
+      const { error } = await supabase.from("site_visits").insert(row);
       if (error) throw error;
+      return "saved";
     },
-    onSuccess: () => { setVisit({ property_id: "", scheduled_at: "" }); void refresh(); }, onError,
+    onSuccess: (r) => { if (r === "queued") toast.info("Offline — visit saved on this device and will sync automatically."); setVisit({ property_id: "", scheduled_at: "" }); void refresh(); }, onError,
   });
   const [offer, setOffer] = useState({ property_id: "", amount: "" });
   const addOffer = useMutation({
@@ -170,6 +177,7 @@ function BuyersPage() {
   return (
     <>
       <PageHeader title="Buyers and matching" description="Capture what a buyer wants, match available properties, and track shortlists, visits and offers." />
+      {offlineOps.some((o) => o.table === "site_visits") && <div className="mb-4 rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground" role="status">{offlineOps.filter((o) => o.table === "site_visits").length} site-visit change(s) waiting to sync.</div>}
       <select className={`${inputCls} mb-6 w-full max-w-md`} value={contactId} onChange={(e) => { setContactId(e.target.value); setPrefDraft(null); }}>
         <option value="">Choose a buyer (contact)…</option>
         {contacts.map((c) => <option key={c.id} value={c.id}>{c.full_name}</option>)}

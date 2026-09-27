@@ -30,4 +30,8 @@
 
 ## Performance
 - Tenant-aware composite indexes on leads, contacts, opportunities, tasks, activities, audit, AI runs, notifications and intake events.
-- List queries are bounded (500–5,000 rows). Load-test plan: seed 50k leads in a demo workspace, measure Leads/Dashboard load (<2 s target) and intake throughput (60 req/min per key).
+- List queries are bounded (500–5,000 rows); Leads paginate 200 per page.
+- Load test (Sep 2026, rolled back): 50,000 leads in one workspace + 10,000 in another, measured as a signed-in admin under RLS.
+  - Before policy optimization: first page 35 ms, full count 1.5 s, filtered search 1.8 s, dashboard aggregate 1.8 s.
+  - After rewriting membership checks to `tenant_id IN (SELECT private.my_tenants(...))` (evaluated once per query): first page 10 ms, count 38 ms, search 57 ms, dashboard aggregate 57 ms. Other workspace visible rows: 0.
+  - Target <2 s met. Intake throughput is capped at 60 req/min per key by design.

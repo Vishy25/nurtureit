@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/lib/tenant-context";
 import { useAuth } from "@/lib/auth-context";
 import { PageHeader } from "@/components/page-header";
+import { queueOp, isOffline, useOfflineQueue } from "@/lib/offline-queue";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
@@ -68,22 +69,29 @@ function TasksPage() {
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["tasks", tenantId] });
 
+  const { ops, online } = useOfflineQueue();
+  const pendingTasks = ops.filter((o) => o.table === "tasks");
+
   const create = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("tasks").insert({
+      const row = {
         tenant_id: tenantId!,
         title: title.trim(),
         kind,
         due_at: due ? new Date(due).toISOString() : null,
         assignee_id: user?.id ?? null,
         created_by: user!.id,
-      });
+      };
+      if (isOffline()) { queueOp({ table: "tasks", op: "insert", row }); return "queued"; }
+      const { error } = await supabase.from("tasks").insert(row);
       if (error) throw error;
+      return "saved";
     },
-    onSuccess: () => {
+    onSuccess: (r) => {
       setTitle("");
       setDue("");
-      toast.success("Task added");
+      if (r === "queued") toast.info("You're offline — task saved on this device and will sync automatically.");
+      else toast.success("Task added");
       void refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -91,13 +99,13 @@ function TasksPage() {
 
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("tasks")
-        .update({ status, completed_at: status === "done" ? new Date().toISOString() : null })
-        .eq("id", id);
+      const patch = { status, completed_at: status === "done" ? new Date().toISOString() : null };
+      if (isOffline()) { queueOp({ table: "tasks", op: "update", target_id: id, row: patch }); return "queued"; }
+      const { error } = await supabase.from("tasks").update(patch).eq("id", id);
       if (error) throw error;
+      return "saved";
     },
-    onSuccess: () => void refresh(),
+    onSuccess: (r) => { if (r === "queued") toast.info("Offline — change will sync when you reconnect."); void refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -120,6 +128,12 @@ function TasksPage() {
         title="Tasks and calendar"
         description="Follow-ups, reminders, site visits and appointments for you and your team."
       />
+      {(!online || pendingTasks.length > 0) && (
+        <div className="mb-4 rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground" role="status">
+          {!online ? "You're offline. New tasks and status changes are saved on this device. " : ""}
+          {pendingTasks.length > 0 ? `${pendingTasks.length} change(s) waiting to sync.` : ""}
+        </div>
+      )}
       {canCreate && (
         <form
           className="mb-6 flex flex-wrap gap-2 rounded-lg border bg-card p-4"
