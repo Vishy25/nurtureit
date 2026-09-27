@@ -34,6 +34,7 @@ const TRIGGERS = [
 const ACTIONS = [
   { id: "create_task", label: "Create a follow-up task" },
   { id: "notify_managers", label: "Alert admins & managers" },
+  { id: "assign_least_loaded", label: "Assign to the rep with fewest open leads" },
 ];
 const STAGES = ["qualification", "discovery", "shortlist", "site_visit", "negotiation", "closing", "closed_won"];
 
@@ -144,6 +145,8 @@ function AutomationsPage() {
         </CardContent>
       </Card>
 
+      {tenantId && <TaskTemplates tenantId={tenantId} canEdit={canEdit} />}
+
       <Card className="lg:col-span-2">
         <CardHeader><CardTitle>Run history</CardTitle><CardDescription>Latest 50 runs.</CardDescription></CardHeader>
         <CardContent>
@@ -159,5 +162,50 @@ function AutomationsPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function TaskTemplates({ tenantId, canEdit }: { tenantId: string; canEdit: boolean }) {
+  const qc = useQueryClient();
+  const [title, setTitle] = useState("");
+  const [kind, setKind] = useState("follow_up");
+  const [due, setDue] = useState("1");
+  const { data = [] } = useQuery({
+    queryKey: ["task-templates", tenantId],
+    queryFn: async () => (await supabase.from("task_templates").select("*").eq("tenant_id", tenantId).order("title")).data ?? [],
+  });
+  const refresh = () => qc.invalidateQueries({ queryKey: ["task-templates", tenantId] });
+  async function add() {
+    if (!title.trim()) return;
+    const { error } = await supabase.from("task_templates").insert({ tenant_id: tenantId, title: title.trim(), kind, due_days: Number(due || 1) });
+    if (error) { toast.error(error.message); return; }
+    setTitle(""); refresh();
+  }
+  async function remove(id: string) {
+    const { error } = await supabase.from("task_templates").delete().eq("id", id);
+    if (error) toast.error(error.message); else refresh();
+  }
+  return (
+    <Card className="lg:col-span-2">
+      <CardHeader><CardTitle>Task templates</CardTitle><CardDescription>Reusable tasks your team can pick on the Tasks page.</CardDescription></CardHeader>
+      <CardContent className="space-y-3">
+        {canEdit && (
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="flex-1"><Label>Title</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Send brochure" /></div>
+            <div><Label>Type</Label>
+              <Select value={kind} onValueChange={setKind}><SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+                <SelectContent>{["call", "email", "meeting", "site_visit", "follow_up"].map((k) => <SelectItem key={k} value={k}>{k.replace("_", " ")}</SelectItem>)}</SelectContent></Select></div>
+            <div><Label>Due in days</Label><Input type="number" min={0} value={due} onChange={(e) => setDue(e.target.value)} className="w-24" /></div>
+            <Button onClick={add}>Add template</Button>
+          </div>
+        )}
+        {data.length ? data.map((t) => (
+          <div key={t.id} className="flex items-center justify-between rounded-md border border-border p-2 text-sm">
+            <span>{t.title} <span className="text-muted-foreground">· {t.kind.replace("_", " ")} · due in {t.due_days}d</span></span>
+            {canEdit && <Button size="sm" variant="ghost" onClick={() => remove(t.id)}>Delete</Button>}
+          </div>
+        )) : <p className="text-sm text-muted-foreground">No templates yet.</p>}
+      </CardContent>
+    </Card>
   );
 }
