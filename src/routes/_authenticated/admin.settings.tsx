@@ -1,4 +1,3 @@
-import { AiControls } from "@/components/ai-controls";
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -75,7 +74,6 @@ function SettingsPage() {
         </CardContent>
       </Card>
       <div className="md:col-span-2"><Button onClick={() => save.mutate()} disabled={save.isPending}>Save settings</Button></div>
-      <div className="md:col-span-2"><AiControls tenantId={currentTenant!.tenantId} /></div>
     </div>
   );
 }
