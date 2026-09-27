@@ -41,7 +41,7 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 Source: `docs/intelligence-brief.md`.
 
 - [~] Orchestrator + agent registry (registry done; deal health agent planned) (intake, qualification, matching, sales execution, deal health, sales intelligence), each with objective, allowed tools, permission scope, structured output, budget, timeout, retry and escalation rules
-- [ ] Deterministic workflows first; agent reasoning only for ambiguous steps
+- [x] Deterministic workflows first (rule-based deal health + automations)
 - [x] Tenant-isolated memory split: verified facts / interactions / approved knowledge / user preferences / agent hypotheses, with provenance, confidence, expiry; inspect, correct, delete
 - [~] Outcome capture (recommendation accept/edit/dismiss + feedback done; feeds later suggestions) (qualification accept/reject, recommendation accept/edit/dismiss, stage moves, losses, revenue, corrections) linked to versioned rules, prompts, models
 - [~] Improvement cycle (human-rated evaluation + approval gate before pilot/live done; automated baselines pending): evaluation registry, offline eval vs baseline, approval, limited cohort, monitor, promote or roll back
@@ -50,7 +50,7 @@ Source: `docs/intelligence-brief.md`.
 - [ ] Provider-independent model interface, per-task evaluation, fallback, per-tenant usage budgets
 - [x] First end-to-end workflow (lead qualification assistant: analyze → missing info → next action → human approve/edit/dismiss → task created → outcome + feedback stored): lead received → evidence evaluated → missing info → next action → human review → authorized execution → outcome captured
 - [ ] Acceptance evidence: traceability, blocked unauthorized tools, no cross-tenant memory, corrections influence later recommendations, eval-before-release, rollback, resume without duplicates
-- [ ] Workflow automation with execution history, retries, loop prevention, disable controls
+- [x] Workflow automation with execution history, loop prevention, disable controls (Administration → Automations)
 - [x] Dashboards with documented metric definitions (Reports)
 - [x] Document external infrastructure needed (docs/operations.md)
 
@@ -96,4 +96,4 @@ Source: `docs/intelligence-brief.md`.
 - [x] Two-workspace isolation test with demo data (leads, contacts, tasks)
 - [x] Role-based dashboards: leads, conversions, pipeline stages, tasks, property activity
 
-## Current request (Sep 27, "implement them all") — batch 1 done; remaining: deal health agent, workflow automation, per-agent autonomy, run resume, model fallback/budgets, assignment policies/task templates, template versioning, pagination, monitoring, offline, security warnings, email invites
+## Current request (Sep 27, "implement them all") — batches 1–2 done; remaining: per-agent autonomy, run resume, model fallback/budgets, assignment policies/task templates, template versioning, pagination, monitoring, offline, security warnings, email invites

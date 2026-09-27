@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createContext, useContext, useState } from "react";
 import { useWorkspaceConfig } from "@/lib/workspace-config";
+import { dealHealth, HEALTH_LABEL } from "@/lib/deal-health";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -99,6 +100,7 @@ function PipelinePage() {
                     <div className="mt-2 flex items-center justify-between">
                       <span className="text-xs">{money(d.value, d.currency)}</span>
                       {d.state !== "open" && <Badge variant={d.state === "lost" ? "destructive" : "secondary"}>{STATE_LABEL[d.state as State]}</Badge>}
+                      {(() => { const h = dealHealth(d); return h.level === "healthy" || h.level === "closed" ? null : <Badge variant={h.level === "critical" ? "destructive" : "outline"} title={h.reasons.join(" · ")}>{HEALTH_LABEL[h.level]}</Badge>; })()}
                     </div>
                   </button>
                 ))}
@@ -116,7 +118,7 @@ function PipelinePage() {
   );
 }
 
-type Deal = { id: string; name: string; stage: string; state: string; value: number | null; currency: string; lost_reason: string | null; follow_up_at: string | null; expected_close: string | null };
+type Deal = { id: string; name: string; stage: string; state: string; value: number | null; currency: string; lost_reason: string | null; follow_up_at: string | null; expected_close: string | null; updated_at: string; contact_id: string | null };
 
 function DealDetail({ deal, tenantId }: { deal: Deal; tenantId: string }) {
   const qc = useQueryClient();
@@ -166,6 +168,11 @@ function DealDetail({ deal, tenantId }: { deal: Deal; tenantId: string }) {
           {deal.follow_up_at && <div><p className="text-xs text-muted-foreground">Follow up</p>{deal.follow_up_at}</div>}
           {deal.lost_reason && <div className="col-span-2"><p className="text-xs text-muted-foreground">Lost reason</p>{deal.lost_reason}</div>}
         </div>
+        {(() => { const h = dealHealth(deal); return h.level === "closed" ? null : (
+          <div className="rounded-md border border-border p-3 text-sm">
+            <p className="font-medium">Deal health: {HEALTH_LABEL[h.level]} ({h.score}/100)</p>
+            {h.reasons.length ? <ul className="mt-1 list-disc pl-5 text-muted-foreground">{h.reasons.map((r) => <li key={r}>{r}</li>)}</ul> : <p className="text-muted-foreground">No risk signals.</p>}
+          </div>); })()}
 
         <div className="flex flex-wrap gap-2">
           {!closed && !paused && idx < STAGES.length - 1 && (
