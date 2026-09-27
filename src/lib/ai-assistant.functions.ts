@@ -115,3 +115,38 @@ export const runEvaluation = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { evaluationId: ev.id as string };
   });
+
+/** Durable-run recovery: marks stale runs uncertain, then retries each uncertain lead run once (resuming saved results without a new AI call). */
+export const retryUncertainRuns = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ tenantId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: isAdmin } = await sb.rpc("has_tenant_role", { _tenant_id: data.tenantId, _roles: ["tenant_admin"] });
+    if (!isAdmin) throw new Error("Only workspace administrators can retry runs.");
+    const now = new Date().toISOString();
+    await sb.from("ai_runs").update({ status: "uncertain", error: "Interrupted before finishing", finished_at: now })
+      .eq("tenant_id", data.tenantId).eq("status", "running").lt("created_at", new Date(Date.now() - 180000).toISOString());
+    const { data: runs } = await sb.from("ai_runs").select("id, lead_id, output, ai_recommendations(id)")
+      .eq("tenant_id", data.tenantId).eq("status", "uncertain").eq("mode", "live").not("lead_id", "is", null)
+      .gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString()).limit(20);
+    let resumed = 0, retried = 0, failed = 0;
+    const seen = new Set<string>();
+    for (const r of runs ?? []) {
+      // Idempotent: claim the uncertain run first so parallel retries cannot both act on it.
+      const { data: claimed } = await sb.from("ai_runs").update({ status: "retried" }).eq("id", r.id).eq("status", "uncertain").select("id");
+      if (!claimed?.length || seen.has(r.lead_id)) continue;
+      seen.add(r.lead_id);
+      if ((r.ai_recommendations ?? []).length) continue; // already delivered — nothing to redo
+      if (r.output) {
+        const { error } = await sb.from("ai_recommendations").insert({ tenant_id: data.tenantId, run_id: r.id, lead_id: r.lead_id, payload: r.output });
+        error ? failed++ : resumed++;
+        continue;
+      }
+      try {
+        await (analyzeLead as any).__executeServer?.({ data: { leadId: r.lead_id }, context });
+        retried++;
+      } catch { failed++; }
+    }
+    return { checked: runs?.length ?? 0, resumed, retried, failed };
+  });
