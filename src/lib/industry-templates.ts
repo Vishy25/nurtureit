@@ -19,6 +19,14 @@ export const INDUSTRY_TEMPLATES: IndustryTemplate[] = [
     stages: ["Enquiry", "Needs", "Recommendation", "Trial / demo", "Offer", "Checkout", "Won"] },
   { id: "staffing", label: "Staffing & recruitment", terms: { catalog: "Open roles", buyers: "Client requirements" },
     stages: ["Qualification", "Discovery", "Candidate shortlist", "Interviews", "Terms", "Placement", "Won"] },
+  { id: "book_sales", label: "Book sales", terms: { catalog: "Titles", buyers: "Reader / retailer needs" },
+    stages: ["Enquiry", "Needs", "Title selection", "Sample copy", "Order terms", "Fulfilment", "Won"] },
+  { id: "agriculture", label: "Agriculture produce", terms: { catalog: "Produce lots", buyers: "Buyer requirements" },
+    stages: ["Enquiry", "Requirements", "Quality sample", "Price quote", "Negotiation", "Delivery", "Won"] },
+  { id: "retreats", label: "Retreat sales", terms: { catalog: "Retreats", buyers: "Guest preferences" },
+    stages: ["Enquiry", "Discovery", "Retreat match", "Consultation call", "Offer", "Deposit", "Booked"] },
+  { id: "senior_living", label: "Senior living", terms: { catalog: "Residences", buyers: "Family requirements" },
+    stages: ["Enquiry", "Needs assessment", "Shortlist", "Tour", "Care & pricing", "Move-in paperwork", "Moved in"] },
 ];
 
 export function getTemplate(id?: string | null) {
