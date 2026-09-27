@@ -177,6 +177,7 @@ function BuyersPage() {
   return (
     <>
       <PageHeader title="Buyers and matching" description="Capture what a buyer wants, match available properties, and track shortlists, visits and offers." />
+      {offlineOps.some((o) => o.table === "site_visits") && <div className="mb-4 rounded-md border bg-muted px-3 py-2 text-sm text-muted-foreground" role="status">{offlineOps.filter((o) => o.table === "site_visits").length} site-visit change(s) waiting to sync.</div>}
       <select className={`${inputCls} mb-6 w-full max-w-md`} value={contactId} onChange={(e) => { setContactId(e.target.value); setPrefDraft(null); }}>
         <option value="">Choose a buyer (contact)…</option>
         {contacts.map((c) => <option key={c.id} value={c.id}>{c.full_name}</option>)}
