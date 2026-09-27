@@ -83,7 +83,7 @@ export function LeadDetail({
       };
       if (canAssign && form.owner_id) patch.owner_id = form.owner_id;
       const existing = ((lead as { custom_fields?: Record<string, unknown> }).custom_fields) ?? {};
-      (patch as Record<string, unknown>).custom_fields = { ...existing, ...cleanCustomValues(cfg?.fields ?? [], custom) };
+      (patch as Record<string, unknown>)["custom_fields"] = { ...existing, ...cleanCustomValues(cfg?.fields ?? [], custom) };
       const { error } = await supabase.from("leads").update(patch).eq("id", lead.id);
       if (error) throw error;
     },
