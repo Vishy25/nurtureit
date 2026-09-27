@@ -2107,8 +2107,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_platform_admin: { Args: never; Returns: boolean }
-      is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
       move_opportunity: {
         Args: {
           _follow_up?: string
@@ -2130,7 +2128,6 @@ export type Database = {
         Returns: undefined
       }
       seed_demo_tenant: { Args: { _name: string }; Returns: string }
-      shares_tenant_with: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:
