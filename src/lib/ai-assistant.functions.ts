@@ -7,12 +7,16 @@ import { scoreLead } from "./scoring";
 const LEAD_COLS = "id, tenant_id, full_name, email, phone, source, status, score, tags, notes, next_action, custom_fields, created_at";
 
 async function gate(sb: any, tenantId: string) {
-  const { data: tenant } = await sb.from("tenants").select("ai_autonomy, ai_paused, ai_daily_run_limit, industry, is_demo").eq("id", tenantId).single();
+  const { data: tenant } = await sb.from("tenants").select("ai_autonomy, ai_paused, ai_daily_run_limit, ai_monthly_run_budget, industry, is_demo").eq("id", tenantId).single();
   if (!tenant) throw new Error("Workspace not found");
   if (tenant.ai_autonomy === "off") throw new Error("AI assistance is turned off for this workspace.");
   if (tenant.ai_paused) throw new Error("AI is paused by a workspace administrator (emergency stop).");
-  const { data: setting } = await sb.from("ai_agent_settings").select("enabled, release_stage, prompt_version").eq("tenant_id", tenantId).eq("agent", LEAD_AGENT.id).maybeSingle();
+  const { data: setting } = await sb.from("ai_agent_settings").select("enabled, release_stage, prompt_version, autonomy").eq("tenant_id", tenantId).eq("agent", LEAD_AGENT.id).maybeSingle();
   if (setting && !setting.enabled) throw new Error("The lead qualification assistant is disabled for this workspace.");
+  if (setting?.autonomy === "off") throw new Error("The lead qualification assistant's autonomy is set to Off.");
+  const monthStart = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1)).toISOString();
+  const { count: monthCount } = await sb.from("ai_runs").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).gte("created_at", monthStart);
+  if ((monthCount ?? 0) >= tenant.ai_monthly_run_budget) throw new Error("This workspace has used its monthly AI budget.");
   const since = new Date(Date.now() - 86400000).toISOString();
   const { count } = await sb.from("ai_runs").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).gte("created_at", since);
   return { tenant, stage: (setting?.release_stage ?? "shadow") as "shadow" | "pilot" | "live", runsToday: count ?? 0 };
@@ -35,8 +39,19 @@ export const analyzeLead = createServerFn({ method: "POST" })
       if (!ok) throw new Error("This assistant is in pilot — only admins and managers can use it for now.");
     }
 
-    const { data: running } = await sb.from("ai_runs").select("id").eq("lead_id", lead.id).eq("status", "running").gte("created_at", new Date(Date.now() - 180000).toISOString()).limit(1);
+    // Reconcile before retry: stale "running" runs become "uncertain"; a completed run whose suggestion was never saved is resumed.
+    await sb.from("ai_runs").update({ status: "uncertain", error: "Interrupted before finishing", finished_at: new Date().toISOString() })
+      .eq("lead_id", lead.id).eq("status", "running").lt("created_at", new Date(Date.now() - 180000).toISOString());
+    const { data: running } = await sb.from("ai_runs").select("id").eq("lead_id", lead.id).eq("status", "running").limit(1);
     if (running?.length) throw new Error("An analysis for this lead is already running.");
+    const { data: done } = await sb.from("ai_runs").select("id, output, ai_recommendations(id)").eq("lead_id", lead.id).eq("status", "completed").eq("mode", "live")
+      .gte("created_at", new Date(Date.now() - 3600000).toISOString()).order("created_at", { ascending: false }).limit(1);
+    const orphan = done?.[0];
+    if (orphan && orphan.output && !(orphan.ai_recommendations ?? []).length) {
+      const { data: rec, error } = await sb.from("ai_recommendations").insert({ tenant_id: lead.tenant_id, run_id: orphan.id, lead_id: lead.id, payload: orphan.output }).select("id").single();
+      if (error) throw new Error(error.message);
+      return { runId: orphan.id as string, recommendationId: rec.id as string, resumed: true };
+    }
 
     const memory = await loadMemory(sb, lead.tenant_id, lead.id);
     const { data: run, error: runErr } = await sb.from("ai_runs").insert({
@@ -48,10 +63,10 @@ export const analyzeLead = createServerFn({ method: "POST" })
     const started = Date.now();
     try {
       const out = await runLeadAgent(lead, tenant.industry, memory);
-      await sb.from("ai_runs").update({ status: "completed", output: out, duration_ms: Date.now() - started, finished_at: new Date().toISOString() }).eq("id", run.id);
+      await sb.from("ai_runs").update({ status: "completed", output: out, model: out.model_used, duration_ms: Date.now() - started, finished_at: new Date().toISOString() }).eq("id", run.id);
       const { data: rec, error } = await sb.from("ai_recommendations").insert({ tenant_id: lead.tenant_id, run_id: run.id, lead_id: lead.id, payload: out }).select("id").single();
       if (error) throw new Error(error.message);
-      return { runId: run.id as string, recommendationId: rec.id as string };
+      return { runId: run.id as string, recommendationId: rec.id as string, resumed: false };
     } catch (e) {
       const msg = e instanceof Error ? e.message : "AI failed";
       await sb.from("ai_runs").update({ status: "failed", error: msg, duration_ms: Date.now() - started, finished_at: new Date().toISOString() }).eq("id", run.id);

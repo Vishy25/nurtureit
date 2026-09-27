@@ -2,6 +2,10 @@ import { getAgent } from "./ai-registry";
 
 const AGENT = getAgent("lead_qualification")!;
 export const LEAD_AGENT = { id: AGENT.id, model: AGENT.model, promptVersion: AGENT.promptVersion };
+/** Provider-independent fallback: used only when the primary model is unavailable (rate limit / server error). */
+export const FALLBACK_MODEL = "google/gemini-3-flash-preview";
+
+class RetryableAIError extends Error {}
 
 const SCHEMA = {
   type: "object",
@@ -64,7 +68,17 @@ export async function loadMemory(sb: any, tenantId: string, leadId: string): Pro
   return (data ?? []).filter((m: any) => !m.expires_at || m.expires_at > now);
 }
 
-export async function runLeadAgent(lead: Record<string, unknown>, industry: string, memory: MemoryItem[]): Promise<LeadRecommendation> {
+/** Calls the primary model and falls back to a second provider on transient failure. Returns the model actually used. */
+export async function runLeadAgent(lead: Record<string, unknown>, industry: string, memory: MemoryItem[]): Promise<LeadRecommendation & { model_used: string }> {
+  try {
+    return { ...(await callModel(LEAD_AGENT.model, lead, industry, memory)), model_used: LEAD_AGENT.model };
+  } catch (e) {
+    if (!(e instanceof RetryableAIError)) throw e;
+    return { ...(await callModel(FALLBACK_MODEL, lead, industry, memory)), model_used: FALLBACK_MODEL };
+  }
+}
+
+async function callModel(model: string, lead: Record<string, unknown>, industry: string, memory: MemoryItem[]): Promise<LeadRecommendation> {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new Error("AI is not configured.");
   const mem = memory.map((m) => `- [${m.id}] (${m.kind}${m.lead_id ? ", about this lead" : ""}) ${m.content}`).join("\n") || "none";
@@ -74,7 +88,7 @@ export async function runLeadAgent(lead: Record<string, unknown>, industry: stri
     method: "POST",
     headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
     body: JSON.stringify({
-      model: LEAD_AGENT.model,
+      model,
       instructions: INSTRUCTIONS,
       input,
       stream: true,
@@ -86,6 +100,7 @@ export async function runLeadAgent(lead: Record<string, unknown>, industry: stri
   });
   if (!res.ok || !res.body) {
     const body = await res.text().catch(() => "");
+    if (res.status === 429 || res.status >= 500) throw new RetryableAIError(`AI request failed (${res.status})`);
     throw new Error(
       res.status === 402 ? "AI credits are used up. Add credits in Settings → Plans & credits."
       : res.status === 429 ? "The AI service is busy. Please try again in a minute."
