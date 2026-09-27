@@ -25,7 +25,7 @@ export function AiDealInsight({ deal, tenantId, canEdit }: { deal: { id: string;
       const uid = (await supabase.auth.getUser()).data.user?.id;
       const { error } = await supabase.from("tasks").insert({
         tenant_id: tenantId, title: s.title, kind: s.kind, status: "open", opportunity_id: deal.id, contact_id: deal.contact_id,
-        due_at: new Date(Date.now() + s.due_in_days * 86400000).toISOString(), assignee_id: uid, created_by: uid!,
+        due_at: new Date(Date.now() + s.due_in_days * 86400000).toISOString(), assignee_id: uid ?? null, created_by: uid!,
         notes: `Approved from deal-health suggestion (run ${res!.runId})`,
       });
       if (error) throw error;
