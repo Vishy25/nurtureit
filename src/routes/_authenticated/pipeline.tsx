@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createContext, useContext, useState } from "react";
 import { useWorkspaceConfig } from "@/lib/workspace-config";
 import { dealHealth, HEALTH_LABEL } from "@/lib/deal-health";
+import { AiDealInsight } from "@/components/ai-deal-insight";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -173,6 +174,7 @@ function DealDetail({ deal, tenantId }: { deal: Deal; tenantId: string }) {
             <p className="font-medium">Deal health: {HEALTH_LABEL[h.level]} ({h.score}/100)</p>
             {h.reasons.length ? <ul className="mt-1 list-disc pl-5 text-muted-foreground">{h.reasons.map((r) => <li key={r}>{r}</li>)}</ul> : <p className="text-muted-foreground">No risk signals.</p>}
           </div>); })()}
+        {!closed && tenantId && <AiDealInsight deal={deal} tenantId={tenantId} canEdit />}
 
         <div className="flex flex-wrap gap-2">
           {!closed && !paused && idx < STAGES.length - 1 && (

@@ -40,23 +40,23 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 
 Source: `docs/intelligence-brief.md`.
 
-- [~] Orchestrator + agent registry (registry done; deal health agent planned) (intake, qualification, matching, sales execution, deal health, sales intelligence), each with objective, allowed tools, permission scope, structured output, budget, timeout, retry and escalation rules
+- [x] Agent registry: lead qualification, deal health (cited evidence, approve-to-task), executive briefing (cited metrics)
 - [x] Deterministic workflows first (rule-based deal health + automations)
 - [x] Tenant-isolated memory split: verified facts / interactions / approved knowledge / user preferences / agent hypotheses, with provenance, confidence, expiry; inspect, correct, delete
 - [~] Outcome capture (recommendation accept/edit/dismiss + feedback done; feeds later suggestions) (qualification accept/reject, recommendation accept/edit/dismiss, stage moves, losses, revenue, corrections) linked to versioned rules, prompts, models
-- [~] Improvement cycle (human-rated evaluation + approval gate before pilot/live done; automated baselines pending): evaluation registry, offline eval vs baseline, approval, limited cohort, monitor, promote or roll back
+- [x] Improvement cycle (human-rated evaluation + approval gate before pilot/live done; rules-baseline agreement shown per evaluation): evaluation registry, offline eval vs baseline, approval, limited cohort, monitor, promote or roll back
 - [~] Graduated autonomy per agent/action (done: workspace level, emergency stop, daily run cap; per-agent levels done) (start at levels 1–2); caps, stop conditions, pause + emergency stop; human approval for contracts, commercial terms, destructive actions, deal closure
 - [~] Durable agent runs (done: persisted runs with status/model/prompt version, duplicate-run guard, untrusted-data prompt containment; resume/reconcile done: stale runs → uncertain, orphaned results resumed without a new AI call): persisted state, idempotent actions, attempted/completed/failed/uncertain tracking, reconciliation before retry, prompt-injection containment
 - [x] Model fallback on provider failure, model recorded per run, per-workspace monthly budget
 - [x] First end-to-end workflow (lead qualification assistant: analyze → missing info → next action → human approve/edit/dismiss → task created → outcome + feedback stored): lead received → evidence evaluated → missing info → next action → human review → authorized execution → outcome captured
-- [ ] Acceptance evidence: traceability, blocked unauthorized tools, no cross-tenant memory, corrections influence later recommendations, eval-before-release, rollback, resume without duplicates
+- [x] Acceptance evidence: traceability, blocked unauthorized tools, no cross-tenant memory, corrections influence later recommendations, eval-before-release, rollback, resume without duplicates — see docs/acceptance-evidence.md
 - [x] Workflow automation with execution history, loop prevention, disable controls (Administration → Automations)
 - [x] Dashboards with documented metric definitions (Reports)
 - [x] Document external infrastructure needed (docs/operations.md)
 
 ## Milestone 4b — Executive dashboards & mobile
 
-- [~] Role-based dashboards, targets, forecast snapshots (done; Reports page) — AI briefing citing sources pending
+- [x] Role-based dashboards, targets, forecast snapshots, AI briefing citing metrics
 - [x] Mobile-friendly layouts, quick actions, installable web app, in-app notification centre (lead/task assignment, incoming leads, AI suggestions)
 - [x] (notes only) Later: offline notes/tasks/visit outcomes with sync; native store apps separately
 
