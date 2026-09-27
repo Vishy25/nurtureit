@@ -644,6 +644,47 @@ export type Database = {
           },
         ]
       }
+      forecast_snapshots: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          open_count: number
+          open_value: number
+          tenant_id: string
+          weighted_value: number
+          won_value_month: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          open_count?: number
+          open_value?: number
+          tenant_id: string
+          weighted_value?: number
+          won_value_month?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          open_count?: number
+          open_value?: number
+          tenant_id?: string
+          weighted_value?: number
+          won_value_month?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forecast_snapshots_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       intake_credentials: {
         Row: {
           created_at: string
@@ -1374,6 +1415,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "properties_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_targets: {
+        Row: {
+          created_at: string
+          created_by: string
+          deals_target: number
+          id: string
+          period_month: string
+          revenue_target: number
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          deals_target?: number
+          id?: string
+          period_month: string
+          revenue_target?: number
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          deals_target?: number
+          id?: string
+          period_month?: string
+          revenue_target?: number
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_targets_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
