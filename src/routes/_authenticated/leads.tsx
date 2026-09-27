@@ -6,6 +6,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useTenant } from "@/lib/tenant-context";
+import { useWorkspaceConfig, cleanCustomValues } from "@/lib/workspace-config";
+import { scoreLead } from "@/lib/scoring";
+import { CustomFieldInputs } from "@/components/custom-field-inputs";
+import { z } from "zod";
 import { PageHeader } from "@/components/page-header";
 import { LeadDetail } from "@/components/lead-detail";
 import { ExportImport, BulkBar, duplicateIds, useMembers } from "@/components/leads-toolbar";
@@ -40,6 +44,7 @@ export const Route = createFileRoute("/_authenticated/leads")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (s) => z.object({ lead: z.string().uuid().optional() }).parse({ lead: typeof s["lead"] === "string" ? s["lead"] : undefined }),
   component: LeadsPage,
 });
 
@@ -67,6 +72,8 @@ function LeadsPage() {
   const [open, setOpen] = useState(false);
   const canCreate = allows("records.edit.own");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { lead: leadParam } = Route.useSearch();
+  useEffect(() => { if (leadParam) setSelectedId(leadParam); }, [leadParam]);
 
   const { data: leads = [], isLoading } = useQuery({
     queryKey: ["leads", tenantId],
@@ -311,14 +318,22 @@ function NewLeadDialog({
     next_action_at: "",
   });
   const [saving, setSaving] = useState(false);
+  const { currentTenant } = useTenant();
+  const { data: cfg } = useWorkspaceConfig(tenantId, currentTenant?.industry);
+  const [custom, setCustom] = useState<Record<string, unknown>>({});
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [k]: e.target.value });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.full_name.trim()) { toast.error("Name is required"); return; }
+    let custom_fields: Record<string, unknown> = {};
+    try { custom_fields = cleanCustomValues(cfg?.fields ?? [], custom); } catch (err) { toast.error((err as Error).message); return; }
+    const s = scoreLead({ full_name: form.full_name, email: form.email, phone: form.phone, source: form.source }, cfg?.scoring);
     setSaving(true);
-    const { error } = await supabase.from("leads").insert({
+    const { error } = await (supabase as any).from("leads").insert({
+      custom_fields,
+      score: s.total,
       tenant_id: tenantId,
       full_name: form.full_name.trim(),
       email: form.email.trim() || null,
@@ -376,6 +391,8 @@ function NewLeadDialog({
             <Input type="date" value={form.next_action_at} onChange={set("next_action_at")} />
           </div>
         </div>
+        <CustomFieldInputs fields={cfg?.fields ?? []} values={custom} onChange={setCustom} />
+        <p className="text-xs text-muted-foreground">The score is calculated from your workspace's scoring rules.</p>
         <DialogFooter>
           <Button type="submit" disabled={saving}>
             {saving ? "Saving…" : "Add lead"}

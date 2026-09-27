@@ -12,6 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Attachments } from "@/components/attachments";
 import { AiLeadAssistant } from "@/components/ai-lead-assistant";
+import { CustomFieldInputs } from "@/components/custom-field-inputs";
+import { useWorkspaceConfig, cleanCustomValues } from "@/lib/workspace-config";
+import { scoreLead } from "@/lib/scoring";
+import { useTenant } from "@/lib/tenant-context";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Lead = Database["public"]["Tables"]["leads"]["Row"];
@@ -33,6 +37,9 @@ export function LeadDetail({
   const navigate = useNavigate();
   const [form, setForm] = useState({ score: "", notes: "", next_action: "", next_action_at: "", owner_id: "", tags: "" });
   const [convert, setConvert] = useState({ open: false, name: "", value: "", close: "" });
+  const { currentTenant } = useTenant();
+  const { data: cfg } = useWorkspaceConfig(tenantId, currentTenant?.industry);
+  const [custom, setCustom] = useState<Record<string, unknown>>({});
 
   useEffect(() => {
     if (!lead) return;
@@ -45,6 +52,7 @@ export function LeadDetail({
       tags: lead.tags.join(", "),
     });
     setConvert({ open: false, name: lead.full_name, value: "", close: "" });
+    setCustom(((lead as { custom_fields?: Record<string, unknown> }).custom_fields) ?? {});
   }, [lead]);
 
   const { data: members = [] } = useQuery({
@@ -74,6 +82,8 @@ export function LeadDetail({
         tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       };
       if (canAssign && form.owner_id) patch.owner_id = form.owner_id;
+      const existing = ((lead as { custom_fields?: Record<string, unknown> }).custom_fields) ?? {};
+      (patch as Record<string, unknown>).custom_fields = { ...existing, ...cleanCustomValues(cfg?.fields ?? [], custom) };
       const { error } = await supabase.from("leads").update(patch).eq("id", lead.id);
       if (error) throw error;
     },
