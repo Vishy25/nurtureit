@@ -143,7 +143,15 @@ export function LeadDetail({
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label>Score (0–100)</Label>
-                    <Input type="number" min={0} max={100} value={form.score} onChange={(e) => setForm({ ...form, score: e.target.value })} />
+                    <div className="flex gap-1">
+                      <Input type="number" min={0} max={100} value={form.score} onChange={(e) => setForm({ ...form, score: e.target.value })} />
+                      <Button type="button" variant="outline" size="sm" className="h-9" title="Recalculate with workspace scoring rules"
+                        onClick={() => {
+                          const s = scoreLead({ full_name: lead.full_name, email: lead.email, phone: lead.phone, source: lead.source, message: form.notes }, cfg?.scoring);
+                          setForm({ ...form, score: String(s.total) });
+                          toast.info(`Rules score: ${s.total} (${s.category}). Save to keep it.`);
+                        }}>Recalc</Button>
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <Label>Owner</Label>
@@ -181,6 +189,7 @@ export function LeadDetail({
                   <Label>Tags (comma separated)</Label>
                   <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
                 </div>
+                <CustomFieldInputs fields={cfg?.fields ?? []} values={custom} onChange={setCustom} disabled={!canEdit} />
                 {canEdit && <Button type="submit" disabled={save.isPending}>Save changes</Button>}
               </fieldset>
             </form>
