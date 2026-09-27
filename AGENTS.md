@@ -19,3 +19,6 @@
 - AI calls run server-side in `src/lib/ai-assistant.functions.ts` under the caller's RLS session, with every run persisted in `ai_runs`. Why: traceability and tenant isolation for agent actions.
 - AI agents are declared in `src/lib/ai-registry.ts`; release to real leads is gated by `ai_agent_settings.release_stage` and a DB trigger requiring an approved `ai_evaluations` row for the same prompt version. Why: no unevaluated prompt reaches real leads.
 - Per-workspace config (stage labels, scoring rules, custom lead fields) is read via `useWorkspaceConfig` in `src/lib/workspace-config.ts`; scoring always goes through `scoreLead(input, config)`. Why: one source of truth for forms, intake and dashboards.
+
+- RLS policies check membership via `tenant_id IN (SELECT private.my_tenants(roles))`; security-definer helpers live in schema `private`. Why: evaluated once per query (40x faster at 50k rows) and not callable from the public API.
+- Offline writes for tasks/site visits go through `queueOp` in `src/lib/offline-queue.ts` (client ids + upsert). Why: safe retries without duplicates.

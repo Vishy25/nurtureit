@@ -58,7 +58,7 @@ Source: `docs/intelligence-brief.md`.
 
 - [x] Role-based dashboards, targets, forecast snapshots, AI briefing citing metrics
 - [x] Mobile-friendly layouts, quick actions, installable web app, in-app notification centre (lead/task assignment, incoming leads, AI suggestions)
-- [x] (notes only) Later: offline notes/tasks/visit outcomes with sync; native store apps separately
+- [x] Offline notes, tasks (create/status) and site visits (schedule/status/outcome) with automatic sync; native store apps separately
 
 ## Milestone 5 — Configuration
 
@@ -97,3 +97,7 @@ Source: `docs/intelligence-brief.md`.
 - [x] Role-based dashboards: leads, conversions, pipeline stages, tasks, property activity
 
 ## Current request (Sep 27, "implement them all") — batches 1–2 done; remaining: template versioning, pagination, monitoring, offline, security warnings, email invites
+
+- [x] Security warnings resolved (helpers moved to private schema)
+- [x] Load test 50k leads: all key queries <60 ms after RLS optimization (docs/operations.md)
+- [ ] Email invites — waiting on DNS NS records for eranki.aimach.net
