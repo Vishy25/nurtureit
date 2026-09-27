@@ -11,10 +11,12 @@ export function AiControls({ tenantId }: { tenantId: string }) {
   const { data } = useQuery({
     queryKey: ["ai-controls", tenantId],
     queryFn: async () => {
-      const [{ data: t }, { data: runs }, { data: recs }] = await Promise.all([
-        sb.from("tenants").select("ai_paused, ai_daily_run_limit").eq("id", tenantId).single(),
+      const monthStart = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1)).toISOString();
+      const [{ data: t }, { data: runs }, { data: recs }, { count: monthRuns }] = await Promise.all([
+        sb.from("tenants").select("ai_paused, ai_daily_run_limit, ai_monthly_run_budget").eq("id", tenantId).single(),
         sb.from("ai_runs").select("id, status, model, prompt_version, error, duration_ms, created_at").eq("tenant_id", tenantId).order("created_at", { ascending: false }).limit(20),
         sb.from("ai_recommendations").select("status, payload, lead_id, created_at, leads(status)").eq("tenant_id", tenantId).order("created_at", { ascending: false }).limit(1000),
+        sb.from("ai_runs").select("id", { count: "exact", head: true }).eq("tenant_id", tenantId).gte("created_at", monthStart),
       ]);
       const counts: Record<string, number> = {};
       (recs ?? []).forEach((r: any) => (counts[r.status] = (counts[r.status] ?? 0) + 1));
@@ -28,7 +30,7 @@ export function AiControls({ tenantId }: { tenantId: string }) {
         o.resolved++;
         if ((outcome === "converted" && q === "qualified") || (outcome === "disqualified" && q === "unqualified")) o.correct++;
       });
-      return { tenant: t, runs: runs ?? [], counts, outcomes: o };
+      return { tenant: t, runs: runs ?? [], counts, outcomes: o, monthRuns: monthRuns ?? 0 };
     },
   });
 
@@ -50,7 +52,7 @@ export function AiControls({ tenantId }: { tenantId: string }) {
     <Card>
       <CardHeader>
         <CardTitle className="font-display text-lg">AI activity & emergency stop</CardTitle>
-        <CardDescription>Every AI run is recorded. Limit: {data?.tenant?.ai_daily_run_limit ?? 200} runs per day.</CardDescription>
+        <CardDescription>Every AI run is recorded. Limit: {data?.tenant?.ai_daily_run_limit ?? 200} runs per day. This month: {data?.monthRuns ?? 0} of {data?.tenant?.ai_monthly_run_budget ?? 3000} budgeted runs.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-wrap items-center gap-3">
