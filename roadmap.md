@@ -51,12 +51,12 @@ Source: `docs/intelligence-brief.md`.
 - [x] First end-to-end workflow (lead qualification assistant: analyze → missing info → next action → human approve/edit/dismiss → task created → outcome + feedback stored): lead received → evidence evaluated → missing info → next action → human review → authorized execution → outcome captured
 - [ ] Acceptance evidence: traceability, blocked unauthorized tools, no cross-tenant memory, corrections influence later recommendations, eval-before-release, rollback, resume without duplicates
 - [ ] Workflow automation with execution history, retries, loop prevention, disable controls
-- [ ] Dashboards with documented metric definitions
-- [ ] Document external infrastructure needed (scheduled job runner, eval runs); no "self-learning" claims without validated results
+- [x] Dashboards with documented metric definitions (Reports)
+- [x] Document external infrastructure needed (docs/operations.md)
 
 ## Milestone 4b — Executive dashboards & mobile
 
-- [ ] Role-based dashboards, targets, forecast snapshots, AI briefing citing sources
+- [~] Role-based dashboards, targets, forecast snapshots (done; Reports page) — AI briefing citing sources pending
 - [x] Mobile-friendly layouts, quick actions, installable web app, in-app notification centre (lead/task assignment, incoming leads, AI suggestions)
 - [ ] Later: offline notes/tasks/visit outcomes with sync; native store apps separately
 
@@ -65,15 +65,15 @@ Source: `docs/intelligence-brief.md`.
 - [x] Industry templates, terminology, typed custom fields, pipeline/stage configuration
 - [ ] Scoring rules, assignment policies, task templates, notifications, trigger-condition-action workflows
 - [ ] Template versioning with safe stage mapping
-- [ ] Software-sales template working without code changes
-- [ ] Starter templates: book sales, agriculture produce, retreat sales, senior living
+- [x] Software-sales template working without code changes (select in Settings)
+- [x] Starter templates: book sales, agriculture produce, retreat sales, senior living
 
 ## Milestone 6 — Hardening
 
 - [ ] End-to-end verification of the acceptance criteria
-- [ ] Pagination, tenant-aware indexes, bounded queries, load-test plan and measurements
+- [~] Tenant-aware indexes, bounded queries, load-test plan done (docs/operations.md); pagination + measurements pending
 - [ ] Structured logs, error monitoring, job status, integration health, cost visibility
-- [ ] Environment, secrets, migration, backup/restore and deployment documentation
+- [x] Environment, secrets, migration, backup/restore and deployment documentation (docs/operations.md)
 
 ## Decisions (Sep 2026)
 
@@ -95,3 +95,5 @@ Source: `docs/intelligence-brief.md`.
 - [x] Custom lead fields; per-workspace stage labels and scoring rules
 - [x] Two-workspace isolation test with demo data (leads, contacts, tasks)
 - [x] Role-based dashboards: leads, conversions, pipeline stages, tasks, property activity
+
+## Current request (Sep 27, "implement them all") — batch 1 done; remaining: deal health agent, workflow automation, per-agent autonomy, run resume, model fallback/budgets, assignment policies/task templates, template versioning, pagination, monitoring, offline, security warnings, email invites
