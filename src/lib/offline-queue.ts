@@ -46,19 +46,75 @@ export async function syncNotes(): Promise<number> {
   return done;
 }
 
+// Generic queue for task and site-visit changes made offline. Inserts carry a
+// client-generated id (upsert ignores repeats); updates are idempotent patches.
+export type QueuedOp = {
+  id: string;
+  table: "tasks" | "site_visits";
+  op: "insert" | "update";
+  target_id?: string;
+  row: Record<string, unknown>;
+  queued_at: string;
+};
+const OPS_KEY = "salesos.offlineOps";
+
+function readOps(): QueuedOp[] {
+  try { return JSON.parse(localStorage.getItem(OPS_KEY) || "[]"); } catch { return []; }
+}
+function writeOps(q: QueuedOp[]) {
+  localStorage.setItem(OPS_KEY, JSON.stringify(q));
+  window.dispatchEvent(new Event(EVT));
+}
+export function isOffline() {
+  return typeof navigator !== "undefined" && !navigator.onLine;
+}
+export function queueOp(o: Omit<QueuedOp, "id" | "queued_at">) {
+  const id = crypto.randomUUID();
+  const row = o.op === "insert" ? { id, ...o.row } : o.row;
+  writeOps([...readOps(), { ...o, row, id, queued_at: new Date().toISOString() }]);
+}
+
+let syncingOps = false;
+export async function syncOps(): Promise<number> {
+  if (syncingOps || !navigator.onLine) return 0;
+  syncingOps = true;
+  let done = 0;
+  try {
+    for (const o of readOps()) {
+      const q = supabase.from(o.table);
+      const { error } = o.op === "insert"
+        ? await q.upsert(o.row as never, { onConflict: "id", ignoreDuplicates: true })
+        : await q.update(o.row as never).eq("id", o.target_id!);
+      if (error) {
+        // permanent rejection (e.g. permissions): drop it so the queue doesn't stall
+        if (error.code && error.code !== "PGRST301" && !/fetch|network/i.test(error.message)) {
+          writeOps(readOps().filter((x) => x.id !== o.id));
+          continue;
+        }
+        break;
+      }
+      writeOps(readOps().filter((x) => x.id !== o.id));
+      done++;
+    }
+  } finally { syncingOps = false; }
+  return done;
+}
+
 export function useOfflineQueue() {
   const [pending, setPending] = useState<QueuedNote[]>([]);
+  const [ops, setOps] = useState<QueuedOp[]>([]);
   const [online, setOnline] = useState(true);
-  const refresh = useCallback(() => setPending(read()), []);
+  const refresh = useCallback(() => { setPending(read()); setOps(readOps()); }, []);
   useEffect(() => {
     refresh();
     setOnline(navigator.onLine);
-    const on = () => { setOnline(true); void syncNotes(); };
+    if (navigator.onLine) { void syncNotes(); void syncOps(); }
+    const on = () => { setOnline(true); void syncNotes(); void syncOps(); };
     const off = () => setOnline(false);
     window.addEventListener(EVT, refresh);
     window.addEventListener("online", on);
     window.addEventListener("offline", off);
     return () => { window.removeEventListener(EVT, refresh); window.removeEventListener("online", on); window.removeEventListener("offline", off); };
   }, [refresh]);
-  return { pending, online };
+  return { pending, ops, online };
 }
