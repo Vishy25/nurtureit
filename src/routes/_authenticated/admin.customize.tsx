@@ -127,7 +127,7 @@ function Scoring({ tenantId, industry }: { tenantId: string; industry: string })
             <Button size="sm" variant="outline" disabled={!newSource.trim()} onClick={() => { setCfg({ ...cfg, sources: { ...cfg.sources, [newSource.trim().toLowerCase()]: 12 } }); setNewSource(""); }}>Add</Button>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">Example: a complete website enquiry scores <Badge variant="outline">{sample.total} · {sample.category}</Badge></p>
+        <div className="text-xs text-muted-foreground">Example: a complete website enquiry scores <Badge variant="outline">{sample.total} · {sample.category}</Badge></div>
         <div className="flex gap-2">
           <Button disabled={save.isPending || cfg.warm >= cfg.hot} onClick={() => save.mutate({ scoring_config: cfg })}>Save scoring rules</Button>
           <Button variant="outline" onClick={() => save.mutate({ scoring_config: null })}>Reset to default</Button>

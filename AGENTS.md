@@ -17,3 +17,5 @@
 - Lead intake lives at `/api/public/intake/v1/leads`, authenticated by hashed per-workspace keys; processing shared in `src/lib/intake.server.ts` so retries reuse the same path. Why: one idempotent code path for live and replayed events.
 - Industry templates only relabel menus/stages (`src/lib/industry-templates.ts`); the underlying stage enum stays fixed. Why: safe switching without data migration.
 - AI calls run server-side in `src/lib/ai-assistant.functions.ts` under the caller's RLS session, with every run persisted in `ai_runs`. Why: traceability and tenant isolation for agent actions.
+- AI agents are declared in `src/lib/ai-registry.ts`; release to real leads is gated by `ai_agent_settings.release_stage` and a DB trigger requiring an approved `ai_evaluations` row for the same prompt version. Why: no unevaluated prompt reaches real leads.
+- Per-workspace config (stage labels, scoring rules, custom lead fields) is read via `useWorkspaceConfig` in `src/lib/workspace-config.ts`; scoring always goes through `scoreLead(input, config)`. Why: one source of truth for forms, intake and dashboards.

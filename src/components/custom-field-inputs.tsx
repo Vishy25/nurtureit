@@ -21,7 +21,7 @@ export function CustomFieldInputs({
           <div key={f.id} className="space-y-1">
             <Label>{f.label}{f.required && " *"}</Label>
             {f.field_type === "select" ? (
-              <Select value={v ? String(v) : ""} onValueChange={(x) => set(f.field_key, x)} disabled={disabled}>
+              <Select value={v ? String(v) : ""} onValueChange={(x) => set(f.field_key, x)} disabled={!!disabled}>
                 <SelectTrigger><SelectValue placeholder="Choose" /></SelectTrigger>
                 <SelectContent>{f.options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
               </Select>

@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-type N = { id: string; title: string; body: string | null; link: string | null; read_at: string | null; created_at: string };
+type N = { id: string; kind: string; title: string; body: string | null; link: string | null; read_at: string | null; created_at: string };
 
 export function NotificationBell({ tenantId }: { tenantId: string }) {
   const qc = useQueryClient();
-  const navigate = useNavigate();
+  const router = useRouter();
   const sb = supabase as any;
   const key = ["notifications", tenantId];
 
@@ -19,7 +19,7 @@ export function NotificationBell({ tenantId }: { tenantId: string }) {
     queryKey: key,
     refetchInterval: 60000,
     queryFn: async () => {
-      const { data, error } = await sb.from("notifications").select("id, title, body, link, read_at, created_at").eq("tenant_id", tenantId).order("created_at", { ascending: false }).limit(30);
+      const { data, error } = await sb.from("notifications").select("id, kind, title, body, link, read_at, created_at").eq("tenant_id", tenantId).order("created_at", { ascending: false }).limit(30);
       if (error) throw error;
       return data as N[];
     },
@@ -67,10 +67,11 @@ export function NotificationBell({ tenantId }: { tenantId: string }) {
             <button
               key={n.id}
               className={cn("block w-full border-b px-3 py-2 text-left last:border-0 hover:bg-muted", !n.read_at && "bg-accent/40")}
-              onClick={() => { markRead.mutate([n.id]); if (n.link) void navigate({ to: n.link }); }}
+              onClick={() => { markRead.mutate([n.id]); if (n.link?.startsWith("/")) router.history.push(n.link); }}
             >
               <p className="text-sm font-medium">{n.title}</p>
               {n.body && <p className="truncate text-xs text-muted-foreground">{n.body}</p>}
+              {n.kind === "ai_suggestion" && <p className="text-xs font-medium text-primary">Review suggestion →</p>}
               <p className="text-[10px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</p>
             </button>
           ))}

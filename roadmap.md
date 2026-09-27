@@ -40,11 +40,11 @@ Source brief: `docs/salesos-brief.md` (Master_Prompt). Implement one milestone a
 
 Source: `docs/intelligence-brief.md`.
 
-- [ ] Orchestrator + agent registry (intake, qualification, matching, sales execution, deal health, sales intelligence), each with objective, allowed tools, permission scope, structured output, budget, timeout, retry and escalation rules
+- [~] Orchestrator + agent registry (registry done; deal health agent planned) (intake, qualification, matching, sales execution, deal health, sales intelligence), each with objective, allowed tools, permission scope, structured output, budget, timeout, retry and escalation rules
 - [ ] Deterministic workflows first; agent reasoning only for ambiguous steps
-- [ ] Tenant-isolated memory split: verified facts / interactions / approved knowledge / user preferences / agent hypotheses, with provenance, confidence, expiry; inspect, correct, delete
+- [x] Tenant-isolated memory split: verified facts / interactions / approved knowledge / user preferences / agent hypotheses, with provenance, confidence, expiry; inspect, correct, delete
 - [~] Outcome capture (recommendation accept/edit/dismiss + feedback done; feeds later suggestions) (qualification accept/reject, recommendation accept/edit/dismiss, stage moves, losses, revenue, corrections) linked to versioned rules, prompts, models
-- [ ] Improvement cycle: evaluation registry, offline eval vs baseline, approval, limited cohort, monitor, promote or roll back
+- [~] Improvement cycle (human-rated evaluation + approval gate before pilot/live done; automated baselines pending): evaluation registry, offline eval vs baseline, approval, limited cohort, monitor, promote or roll back
 - [~] Graduated autonomy per agent/action (done: workspace level, emergency stop, daily run cap; pending: per-agent levels) (start at levels 1–2); caps, stop conditions, pause + emergency stop; human approval for contracts, commercial terms, destructive actions, deal closure
 - [~] Durable agent runs (done: persisted runs with status/model/prompt version, duplicate-run guard, untrusted-data prompt containment; pending: resume/reconcile): persisted state, idempotent actions, attempted/completed/failed/uncertain tracking, reconciliation before retry, prompt-injection containment
 - [ ] Provider-independent model interface, per-task evaluation, fallback, per-tenant usage budgets
@@ -90,8 +90,8 @@ Source: `docs/intelligence-brief.md`.
 - Default currency per tenant is USD; no cross-currency conversion policy yet.
 
 ## Current request (Sep 27)
-- [ ] AI agent registry, tenant-isolated memory, evaluation + release cycle (shadow → pilot → live)
-- [ ] AI suggestions in alert bell, opening the lead panel to act
-- [ ] Custom lead fields; per-workspace stage labels and scoring rules
-- [ ] Two-workspace isolation test with demo data (leads, contacts, tasks)
-- [ ] Role-based dashboards: leads, conversions, pipeline stages, tasks, property activity
+- [x] AI agent registry, tenant-isolated memory, evaluation + release cycle (shadow → pilot → live)
+- [x] AI suggestions in alert bell, opening the lead panel to act
+- [x] Custom lead fields; per-workspace stage labels and scoring rules
+- [x] Two-workspace isolation test with demo data (leads, contacts, tasks)
+- [x] Role-based dashboards: leads, conversions, pipeline stages, tasks, property activity
