@@ -25,8 +25,12 @@ async function gate(sb: any, tenantId: string) {
 export const analyzeLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ leadId: z.string().uuid() }).parse(d))
-  .handler(async ({ data, context }) => {
-    const sb = context.supabase as any;
+  .handler(async ({ data, context }) => analyzeLeadCore(context.supabase as any, context.userId, data.leadId));
+
+async function analyzeLeadCore(sb: any, userId: string, leadId: string, retryOf?: string) {
+  const context = { userId };
+  const data = { leadId };
+  {
     const { data: lead } = await sb.from("leads").select(LEAD_COLS).eq("id", data.leadId).maybeSingle(); // RLS-scoped
     if (!lead) throw new Error("Lead not found");
 
@@ -56,7 +60,7 @@ export const analyzeLead = createServerFn({ method: "POST" })
     const memory = await loadMemory(sb, lead.tenant_id, lead.id);
     const { data: run, error: runErr } = await sb.from("ai_runs").insert({
       tenant_id: lead.tenant_id, lead_id: lead.id, agent: LEAD_AGENT.id, prompt_version: LEAD_AGENT.promptVersion, model: LEAD_AGENT.model,
-      input_snapshot: { lead, memory_ids: memory.map((m) => m.id), release_stage: stage }, created_by: context.userId, mode: "live",
+      input_snapshot: { lead, memory_ids: memory.map((m) => m.id), release_stage: stage }, created_by: context.userId, mode: "live", retry_of: retryOf ?? null,
     }).select("id").single();
     if (runErr) throw new Error(runErr.message);
 
@@ -72,7 +76,8 @@ export const analyzeLead = createServerFn({ method: "POST" })
       await sb.from("ai_runs").update({ status: "failed", error: msg, duration_ms: Date.now() - started, finished_at: new Date().toISOString() }).eq("id", run.id);
       throw new Error(msg);
     }
-  });
+  }
+}
 
 /** Shadow evaluation: runs the agent on recent leads without creating suggestions, tasks or notifications. */
 export const runEvaluation = createServerFn({ method: "POST" })
@@ -144,7 +149,7 @@ export const retryUncertainRuns = createServerFn({ method: "POST" })
         continue;
       }
       try {
-        await (analyzeLead as any).__executeServer?.({ data: { leadId: r.lead_id }, context });
+        await analyzeLeadCore(sb, context.userId, r.lead_id, r.id);
         retried++;
       } catch { failed++; }
     }
