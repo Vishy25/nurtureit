@@ -14,11 +14,21 @@ export function AiControls({ tenantId }: { tenantId: string }) {
       const [{ data: t }, { data: runs }, { data: recs }] = await Promise.all([
         sb.from("tenants").select("ai_paused, ai_daily_run_limit").eq("id", tenantId).single(),
         sb.from("ai_runs").select("id, status, model, prompt_version, error, duration_ms, created_at").eq("tenant_id", tenantId).order("created_at", { ascending: false }).limit(20),
-        sb.from("ai_recommendations").select("status").eq("tenant_id", tenantId),
+        sb.from("ai_recommendations").select("status, payload, lead_id, created_at, leads(status)").eq("tenant_id", tenantId).order("created_at", { ascending: false }).limit(1000),
       ]);
       const counts: Record<string, number> = {};
       (recs ?? []).forEach((r: any) => (counts[r.status] = (counts[r.status] ?? 0) + 1));
-      return { tenant: t, runs: runs ?? [], counts };
+      // Outcome check: compare the latest suggestion per lead with what actually happened to that lead.
+      const seen = new Set<string>();
+      const o = { resolved: 0, correct: 0, openLeads: 0 };
+      (recs ?? []).forEach((r: any) => {
+        if (seen.has(r.lead_id)) return; seen.add(r.lead_id);
+        const outcome = r.leads?.status; const q = r.payload?.qualification;
+        if (outcome !== "converted" && outcome !== "disqualified") { o.openLeads++; return; }
+        o.resolved++;
+        if ((outcome === "converted" && q === "qualified") || (outcome === "disqualified" && q === "unqualified")) o.correct++;
+      });
+      return { tenant: t, runs: runs ?? [], counts, outcomes: o };
     },
   });
 
@@ -52,6 +62,17 @@ export function AiControls({ tenantId }: { tenantId: string }) {
             Suggestions: {c.pending ?? 0} waiting · {c.accepted ?? 0} approved · {c.edited ?? 0} changed · {c.dismissed ?? 0} dismissed
             {decided > 0 && ` · ${Math.round((((c.accepted ?? 0) + (c.edited ?? 0)) / decided) * 100)}% useful`}
           </span>
+        </div>
+        <div className="rounded border p-3 text-sm">
+          <p className="font-medium">Measured against real outcomes</p>
+          {data?.outcomes.resolved ? (
+            <p className="text-muted-foreground">
+              Of {data.outcomes.resolved} leads that have since been converted or disqualified, the assistant's call was right for {data.outcomes.correct} ({Math.round((data.outcomes.correct / data.outcomes.resolved) * 100)}%). {data.outcomes.openLeads} analyzed leads are still open.
+            </p>
+          ) : (
+            <p className="text-muted-foreground">No analyzed lead has been converted or disqualified yet. This fills in as leads close ({data?.outcomes.openLeads ?? 0} analyzed leads still open).</p>
+          )}
+          <p className="mt-1 text-xs text-muted-foreground">"Right" means it said qualified and the lead converted, or unqualified and the lead was disqualified. "Needs info" counts as not right.</p>
         </div>
         <div className="max-h-72 overflow-auto rounded border text-xs">
           {data?.runs.length === 0 && <p className="p-3 text-muted-foreground">No AI runs yet.</p>}
