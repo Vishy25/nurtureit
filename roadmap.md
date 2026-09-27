@@ -45,9 +45,9 @@ Source: `docs/intelligence-brief.md`.
 - [x] Tenant-isolated memory split: verified facts / interactions / approved knowledge / user preferences / agent hypotheses, with provenance, confidence, expiry; inspect, correct, delete
 - [~] Outcome capture (recommendation accept/edit/dismiss + feedback done; feeds later suggestions) (qualification accept/reject, recommendation accept/edit/dismiss, stage moves, losses, revenue, corrections) linked to versioned rules, prompts, models
 - [~] Improvement cycle (human-rated evaluation + approval gate before pilot/live done; automated baselines pending): evaluation registry, offline eval vs baseline, approval, limited cohort, monitor, promote or roll back
-- [~] Graduated autonomy per agent/action (done: workspace level, emergency stop, daily run cap; pending: per-agent levels) (start at levels 1–2); caps, stop conditions, pause + emergency stop; human approval for contracts, commercial terms, destructive actions, deal closure
-- [~] Durable agent runs (done: persisted runs with status/model/prompt version, duplicate-run guard, untrusted-data prompt containment; pending: resume/reconcile): persisted state, idempotent actions, attempted/completed/failed/uncertain tracking, reconciliation before retry, prompt-injection containment
-- [ ] Provider-independent model interface, per-task evaluation, fallback, per-tenant usage budgets
+- [~] Graduated autonomy per agent/action (done: workspace level, emergency stop, daily run cap; per-agent levels done) (start at levels 1–2); caps, stop conditions, pause + emergency stop; human approval for contracts, commercial terms, destructive actions, deal closure
+- [~] Durable agent runs (done: persisted runs with status/model/prompt version, duplicate-run guard, untrusted-data prompt containment; resume/reconcile done: stale runs → uncertain, orphaned results resumed without a new AI call): persisted state, idempotent actions, attempted/completed/failed/uncertain tracking, reconciliation before retry, prompt-injection containment
+- [x] Model fallback on provider failure, model recorded per run, per-workspace monthly budget
 - [x] First end-to-end workflow (lead qualification assistant: analyze → missing info → next action → human approve/edit/dismiss → task created → outcome + feedback stored): lead received → evidence evaluated → missing info → next action → human review → authorized execution → outcome captured
 - [ ] Acceptance evidence: traceability, blocked unauthorized tools, no cross-tenant memory, corrections influence later recommendations, eval-before-release, rollback, resume without duplicates
 - [x] Workflow automation with execution history, loop prevention, disable controls (Administration → Automations)
@@ -96,4 +96,4 @@ Source: `docs/intelligence-brief.md`.
 - [x] Two-workspace isolation test with demo data (leads, contacts, tasks)
 - [x] Role-based dashboards: leads, conversions, pipeline stages, tasks, property activity
 
-## Current request (Sep 27, "implement them all") — batches 1–2 done; remaining: per-agent autonomy, run resume, model fallback/budgets, assignment policies/task templates, template versioning, pagination, monitoring, offline, security warnings, email invites
+## Current request (Sep 27, "implement them all") — batches 1–2 done; remaining: assignment policies/task templates, template versioning, pagination, monitoring, offline, security warnings, email invites
