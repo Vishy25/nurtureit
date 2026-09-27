@@ -43,10 +43,10 @@ Source: `docs/intelligence-brief.md`.
 - [x] Agent registry: lead qualification, deal health (cited evidence, approve-to-task), executive briefing (cited metrics)
 - [x] Deterministic workflows first (rule-based deal health + automations)
 - [x] Tenant-isolated memory split: verified facts / interactions / approved knowledge / user preferences / agent hypotheses, with provenance, confidence, expiry; inspect, correct, delete
-- [~] Outcome capture (recommendation accept/edit/dismiss + feedback done; feeds later suggestions) (qualification accept/reject, recommendation accept/edit/dismiss, stage moves, losses, revenue, corrections) linked to versioned rules, prompts, models
+- [x] Outcome capture (Administration → AI → Suggestion outcomes: decision, lead status, deal stage moves, losses, revenue, score corrections per prompt version/model) (recommendation accept/edit/dismiss + feedback done; feeds later suggestions) (qualification accept/reject, recommendation accept/edit/dismiss, stage moves, losses, revenue, corrections) linked to versioned rules, prompts, models
 - [x] Improvement cycle (human-rated evaluation + approval gate before pilot/live done; rules-baseline agreement shown per evaluation): evaluation registry, offline eval vs baseline, approval, limited cohort, monitor, promote or roll back
 - [~] Graduated autonomy per agent/action (done: workspace level, emergency stop, daily run cap; per-agent levels done) (start at levels 1–2); caps, stop conditions, pause + emergency stop; human approval for contracts, commercial terms, destructive actions, deal closure
-- [~] Durable agent runs (done: persisted runs with status/model/prompt version, duplicate-run guard, untrusted-data prompt containment; resume/reconcile done: stale runs → uncertain, orphaned results resumed without a new AI call): persisted state, idempotent actions, attempted/completed/failed/uncertain tracking, reconciliation before retry, prompt-injection containment
+- [x] Durable agent runs (admin "Retry interrupted runs": idempotent claim, resume saved output, else re-run once linked via retry_of) (done: persisted runs with status/model/prompt version, duplicate-run guard, untrusted-data prompt containment; resume/reconcile done: stale runs → uncertain, orphaned results resumed without a new AI call): persisted state, idempotent actions, attempted/completed/failed/uncertain tracking, reconciliation before retry, prompt-injection containment
 - [x] Model fallback on provider failure, model recorded per run, per-workspace monthly budget
 - [x] First end-to-end workflow (lead qualification assistant: analyze → missing info → next action → human approve/edit/dismiss → task created → outcome + feedback stored): lead received → evidence evaluated → missing info → next action → human review → authorized execution → outcome captured
 - [x] Acceptance evidence: traceability, blocked unauthorized tools, no cross-tenant memory, corrections influence later recommendations, eval-before-release, rollback, resume without duplicates — see docs/acceptance-evidence.md
@@ -70,7 +70,7 @@ Source: `docs/intelligence-brief.md`.
 
 ## Milestone 6 — Hardening
 
-- [ ] End-to-end verification of the acceptance criteria
+- [x] End-to-end verification (Sep 27 2026): 8/8 acceptance checks, isolation test, all 18 pages load signed-in with 0 errors
 - [~] Tenant-aware indexes, bounded queries, load-test plan done (docs/operations.md); pagination + measurements pending
 - [x] (partial) Structured logs, error monitoring, job status, integration health, cost visibility
 - [x] Environment, secrets, migration, backup/restore and deployment documentation (docs/operations.md)

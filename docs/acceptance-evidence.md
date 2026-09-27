@@ -15,3 +15,10 @@ Last run: 2026-09-27 — all passed.
 
 Evaluation baseline: each evaluation compares AI qualification to the deterministic scoring rules ("agrees with rules x/y") alongside human ratings.
 Deal-health and briefing assistants are advisory only: they cite evidence ids, drop uncited claims, and never change data without a person approving.
+
+
+## Run Sep 27 2026
+
+`1 memory of B visible=0 insert=blocked | 2 rep release=blocked | 3 skip=blocked direct-edit=blocked | 4 forge=blocked | 5 ungated pilot=blocked | 6 live-then-rollback ok=t | 7 emergency stop set=t | 8 outcomes of B visible=0 first claim=1 second claim=0`
+
+Isolation: `A visible: leads=3 contacts=2 tasks=2 | B visible: all 0 | B updated=0 | B insert blocked=yes`. Signed-in walk of 18 pages: 0 console/page errors.
