@@ -17,6 +17,7 @@ type Rec = {
   missing_info: string[];
   next_action: { kind: string; title: string; due_in_days: number; rationale: string };
   draft_message: string | null;
+  memory_used?: string[];
 };
 
 export function AiLeadAssistant({ leadId, tenantId, canAct }: { leadId: string; tenantId: string; canAct: boolean }) {
@@ -64,6 +65,9 @@ export function AiLeadAssistant({ leadId, tenantId, canAct }: { leadId: string; 
         task_id, decided_by: (await supabase.auth.getUser()).data.user?.id, decided_at: new Date().toISOString(),
       }).eq("id", rec.id);
       if (error) throw error;
+      if (feedback.trim()) {
+        await (supabase as any).from("ai_memory").insert({ tenant_id: tenantId, kind: "preference", content: feedback.trim().slice(0, 1000), source: `feedback:${rec.id}`, confidence: 0.8 });
+      }
       await supabase.from("audit_events").insert({ tenant_id: tenantId, action: `ai.recommendation_${action}`, entity_type: "lead", entity_id: leadId, metadata: { recommendation_id: rec.id, task_id } });
     },
     onSuccess: (_d, action) => {
@@ -119,7 +123,51 @@ export function AiLeadAssistant({ leadId, tenantId, canAct }: { leadId: string; 
               </div>
             </>
           )}
+          {!!p.memory_used?.length && <p className="text-[10px] text-muted-foreground">Used {p.memory_used.length} workspace memory item(s)</p>}
           <p className="text-[10px] text-muted-foreground">{rec.ai_runs?.model} · {rec.ai_runs?.prompt_version} · {new Date(rec.created_at).toLocaleString()}</p>
+        </div>
+      )}
+      <LeadMemory leadId={leadId} tenantId={tenantId} canAct={canAct} />
+    </div>
+  );
+}
+
+function LeadMemory({ leadId, tenantId, canAct }: { leadId: string; tenantId: string; canAct: boolean }) {
+  const qc = useQueryClient();
+  const [text, setText] = useState("");
+  const key = ["ai-memory-lead", leadId];
+  const { data: items = [] } = useQuery({
+    queryKey: key,
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("ai_memory").select("id, kind, content").eq("lead_id", leadId).order("created_at", { ascending: false });
+      return (data ?? []) as { id: string; kind: string; content: string }[];
+    },
+  });
+  const add = useMutation({
+    mutationFn: async () => {
+      const { error } = await (supabase as any).from("ai_memory").insert({ tenant_id: tenantId, lead_id: leadId, kind: "verified_fact", content: text.trim(), source: "manual" });
+      if (error) throw error;
+    },
+    onSuccess: () => { setText(""); qc.invalidateQueries({ queryKey: key }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const del = useMutation({
+    mutationFn: async (id: string) => { await (supabase as any).from("ai_memory").delete().eq("id", id); },
+    onSuccess: () => qc.invalidateQueries({ queryKey: key }),
+  });
+  return (
+    <div className="space-y-1">
+      <p className="text-xs font-medium">Facts the assistant should know about this lead</p>
+      {items.map((m) => (
+        <div key={m.id} className="flex items-center gap-2 text-xs">
+          <span className="flex-1">{m.content}</span>
+          {canAct && <button className="text-muted-foreground hover:text-destructive" onClick={() => del.mutate(m.id)}>Remove</button>}
+        </div>
+      ))}
+      {canAct && (
+        <div className="flex gap-2">
+          <Input placeholder="e.g. Prefers calls after 6pm" value={text} onChange={(e) => setText(e.target.value)} className="h-8 text-xs" />
+          <Button size="sm" variant="outline" disabled={!text.trim() || add.isPending} onClick={() => add.mutate()}>Add</Button>
         </div>
       )}
     </div>
