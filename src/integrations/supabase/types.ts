@@ -63,6 +63,13 @@ export type Database = {
             foreignKeyName: "activities_opportunity_id_fkey"
             columns: ["opportunity_id"]
             isOneToOne: false
+            referencedRelation: "ai_recommendation_outcomes"
+            referencedColumns: ["opportunity_id"]
+          },
+          {
+            foreignKeyName: "activities_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
             referencedRelation: "opportunities"
             referencedColumns: ["id"]
           },
@@ -319,6 +326,7 @@ export type Database = {
           model: string
           output: Json | null
           prompt_version: string
+          retry_of: string | null
           status: string
           tenant_id: string
         }
@@ -336,6 +344,7 @@ export type Database = {
           model: string
           output?: Json | null
           prompt_version: string
+          retry_of?: string | null
           status?: string
           tenant_id: string
         }
@@ -353,6 +362,7 @@ export type Database = {
           model?: string
           output?: Json | null
           prompt_version?: string
+          retry_of?: string | null
           status?: string
           tenant_id?: string
         }
@@ -362,6 +372,13 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_runs_retry_of_fkey"
+            columns: ["retry_of"]
+            isOneToOne: false
+            referencedRelation: "ai_runs"
             referencedColumns: ["id"]
           },
           {
@@ -1286,6 +1303,13 @@ export type Database = {
             foreignKeyName: "offers_opportunity_id_fkey"
             columns: ["opportunity_id"]
             isOneToOne: false
+            referencedRelation: "ai_recommendation_outcomes"
+            referencedColumns: ["opportunity_id"]
+          },
+          {
+            foreignKeyName: "offers_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
             referencedRelation: "opportunities"
             referencedColumns: ["id"]
           },
@@ -1432,6 +1456,13 @@ export type Database = {
           to_state?: Database["public"]["Enums"]["opp_state"]
         }
         Relationships: [
+          {
+            foreignKeyName: "opportunity_stage_history_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "ai_recommendation_outcomes"
+            referencedColumns: ["opportunity_id"]
+          },
           {
             foreignKeyName: "opportunity_stage_history_opportunity_id_fkey"
             columns: ["opportunity_id"]
@@ -1865,6 +1896,13 @@ export type Database = {
             foreignKeyName: "tasks_opportunity_id_fkey"
             columns: ["opportunity_id"]
             isOneToOne: false
+            referencedRelation: "ai_recommendation_outcomes"
+            referencedColumns: ["opportunity_id"]
+          },
+          {
+            foreignKeyName: "tasks_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
             referencedRelation: "opportunities"
             referencedColumns: ["id"]
           },
@@ -2004,7 +2042,47 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      ai_recommendation_outcomes: {
+        Row: {
+          agent: string | null
+          created_at: string | null
+          currency: string | null
+          decided_at: string | null
+          decision: string | null
+          feedback: string | null
+          lead_id: string | null
+          lead_name: string | null
+          lead_status: Database["public"]["Enums"]["lead_status"] | null
+          lost_reason: string | null
+          model: string | null
+          opp_stage: Database["public"]["Enums"]["opp_stage"] | null
+          opp_state: Database["public"]["Enums"]["opp_state"] | null
+          opp_value: number | null
+          opportunity_id: string | null
+          prompt_version: string | null
+          recommendation_id: string | null
+          recommended: string | null
+          score_corrections: number | null
+          stage_moves: number | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_recommendations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_recommendations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_invitation: { Args: { _token: string }; Returns: string }
