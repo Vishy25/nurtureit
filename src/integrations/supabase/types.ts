@@ -465,6 +465,101 @@ export type Database = {
           },
         ]
       }
+      automation_rules: {
+        Row: {
+          action: string
+          action_config: Json
+          condition: Json
+          created_at: string
+          created_by: string
+          enabled: boolean
+          id: string
+          name: string
+          tenant_id: string
+          trigger_event: string
+        }
+        Insert: {
+          action: string
+          action_config?: Json
+          condition?: Json
+          created_at?: string
+          created_by?: string
+          enabled?: boolean
+          id?: string
+          name: string
+          tenant_id: string
+          trigger_event: string
+        }
+        Update: {
+          action?: string
+          action_config?: Json
+          condition?: Json
+          created_at?: string
+          created_by?: string
+          enabled?: boolean
+          id?: string
+          name?: string
+          tenant_id?: string
+          trigger_event?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_rules_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_runs: {
+        Row: {
+          created_at: string
+          detail: string | null
+          entity_id: string
+          event_key: string
+          id: string
+          rule_id: string
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          entity_id: string
+          event_key: string
+          id?: string
+          rule_id: string
+          status: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          entity_id?: string
+          event_key?: string
+          id?: string
+          rule_id?: string
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_runs_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_runs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buyer_preferences: {
         Row: {
           budget_max: number | null
@@ -1811,6 +1906,16 @@ export type Database = {
           _reason?: string
           _to_stage: Database["public"]["Enums"]["opp_stage"]
           _to_state: Database["public"]["Enums"]["opp_state"]
+        }
+        Returns: undefined
+      }
+      run_automations: {
+        Args: {
+          _ctx: Json
+          _entity: string
+          _event: string
+          _event_key: string
+          _tenant: string
         }
         Returns: undefined
       }
