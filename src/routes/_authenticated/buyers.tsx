@@ -33,6 +33,7 @@ type Property = {
 };
 
 function BuyersPage() {
+  const { ops: offlineOps } = useOfflineQueue();
   const { currentTenant, role } = useTenant();
   const { user } = useAuth();
   const qc = useQueryClient();
