@@ -530,6 +530,7 @@ export type Database = {
           consent_source: string | null
           created_at: string
           created_by: string
+          custom_fields: Json
           email: string | null
           full_name: string
           id: string
@@ -547,6 +548,7 @@ export type Database = {
           consent_source?: string | null
           created_at?: string
           created_by?: string
+          custom_fields?: Json
           email?: string | null
           full_name: string
           id?: string
@@ -564,6 +566,7 @@ export type Database = {
           consent_source?: string | null
           created_at?: string
           created_by?: string
+          custom_fields?: Json
           email?: string | null
           full_name?: string
           id?: string

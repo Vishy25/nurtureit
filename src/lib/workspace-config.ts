@@ -18,6 +18,7 @@ export type WorkspaceConfig = {
   scoring: ScoringConfig;
   hasCustomScoring: boolean;
   fields: CustomFieldDef[];
+  contactFields: CustomFieldDef[];
 };
 
 export function useWorkspaceConfig(tenantId: string | undefined, industry: string | undefined) {
@@ -28,11 +29,11 @@ export function useWorkspaceConfig(tenantId: string | undefined, industry: strin
       const sb = supabase as any;
       const [{ data: t }, { data: f }] = await Promise.all([
         sb.from("tenants").select("stage_labels, scoring_config").eq("id", tenantId).single(),
-        sb.from("custom_field_defs").select("id, field_key, label, field_type, options, required, position").eq("tenant_id", tenantId).eq("entity", "lead").order("position"),
+        sb.from("custom_field_defs").select("id, entity, field_key, label, field_type, options, required, position").eq("tenant_id", tenantId).order("position"),
       ]);
       const base = getTemplate(industry).stages;
       const labels: string[] = Array.isArray(t?.stage_labels) && t.stage_labels.length === 7 ? t.stage_labels : base;
-      return { stageLabels: labels, scoring: resolveScoring(t?.scoring_config), hasCustomScoring: !!t?.scoring_config, fields: f ?? [] };
+      return { stageLabels: labels, scoring: resolveScoring(t?.scoring_config), hasCustomScoring: !!t?.scoring_config, fields: (f ?? []).filter((x: any) => x.entity === "lead"), contactFields: (f ?? []).filter((x: any) => x.entity === "contact") };
     },
   });
 }
