@@ -48,12 +48,12 @@ function Registry({ tenantId, isAdmin, isDemo }: { tenantId: string; isAdmin: bo
   const sb = supabase as any;
   const { data: settings = [] } = useQuery({
     queryKey: ["ai-agent-settings", tenantId],
-    queryFn: async () => (await sb.from("ai_agent_settings").select("agent, enabled, release_stage, prompt_version").eq("tenant_id", tenantId)).data ?? [],
+    queryFn: async () => (await sb.from("ai_agent_settings").select("agent, enabled, release_stage, prompt_version, autonomy").eq("tenant_id", tenantId)).data ?? [],
   });
   const save = useMutation({
-    mutationFn: async (p: { agent: string; prompt_version: string; release_stage?: ReleaseStage; enabled?: boolean }) => {
+    mutationFn: async (p: { agent: string; prompt_version: string; release_stage?: ReleaseStage; enabled?: boolean; autonomy?: string }) => {
       const cur = settings.find((s: any) => s.agent === p.agent);
-      const row = { tenant_id: tenantId, agent: p.agent, prompt_version: p.prompt_version, release_stage: p.release_stage ?? cur?.release_stage ?? "shadow", enabled: p.enabled ?? cur?.enabled ?? true };
+      const row = { tenant_id: tenantId, agent: p.agent, prompt_version: p.prompt_version, release_stage: p.release_stage ?? cur?.release_stage ?? "shadow", enabled: p.enabled ?? cur?.enabled ?? true, autonomy: p.autonomy ?? cur?.autonomy ?? "suggest" };
       const { error } = await sb.from("ai_agent_settings").upsert(row, { onConflict: "tenant_id,agent" });
       if (error) throw error;
       await supabase.from("audit_events").insert({ tenant_id: tenantId, action: "ai.agent_settings_changed", entity_type: "tenant", entity_id: tenantId, metadata: row });
@@ -85,13 +85,17 @@ function Registry({ tenantId, isAdmin, isDemo }: { tenantId: string; isAdmin: bo
               <div className="grid gap-2 text-xs md:grid-cols-3">
                 <div><p className="font-medium">May do</p><ul className="ml-4 list-disc">{a.allowedActions.map((x) => <li key={x}>{x}</li>)}</ul></div>
                 <div><p className="font-medium">Needs a person to approve</p><ul className="ml-4 list-disc">{a.requiresApproval.map((x) => <li key={x}>{x}</li>)}</ul></div>
-                <div><p className="font-medium">Can see</p><p>{a.readScope}</p><p className="mt-1 text-muted-foreground">{a.model}</p></div>
+                <div><p className="font-medium">Can see</p><p>{a.readScope}</p><p className="mt-1 text-muted-foreground">{a.model} (fallback: Gemini Flash)</p></div>
               </div>
               {isAdmin && !planned && (
                 <div className="flex flex-wrap items-center gap-2">
                   <Select value={stage} onValueChange={(v) => save.mutate({ agent: a.id, prompt_version: a.promptVersion, release_stage: v as ReleaseStage })}>
                     <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                     <SelectContent>{RELEASE_STAGES.map((r) => <SelectItem key={r.id} value={r.id}>{r.label}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Select value={s?.autonomy ?? "suggest"} onValueChange={(v) => save.mutate({ agent: a.id, prompt_version: a.promptVersion, autonomy: v })}>
+                    <SelectTrigger className="w-40" aria-label="Autonomy"><SelectValue /></SelectTrigger>
+                    <SelectContent><SelectItem value="off">Autonomy: Off</SelectItem><SelectItem value="suggest">Autonomy: Suggest only</SelectItem><SelectItem value="low_risk">Autonomy: Low-risk</SelectItem></SelectContent>
                   </Select>
                   <Button size="sm" variant="outline" onClick={() => save.mutate({ agent: a.id, prompt_version: a.promptVersion, enabled: !(s?.enabled ?? true) })}>
                     {(s?.enabled ?? true) ? "Disable" : "Enable"}
