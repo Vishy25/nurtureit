@@ -288,6 +288,12 @@ function LeadsPage() {
             ))}
           </tbody>
         </table>
+        <div className="flex items-center justify-between border-t border-border px-4 py-3 text-xs text-muted-foreground">
+          <span>Showing {leads.length} of {totalLeads} leads</span>
+          {leads.length < totalLeads && (
+            <Button size="sm" variant="outline" onClick={() => setPageLimit((n) => n + 200)}>Load more</Button>
+          )}
+        </div>
       </div>
       {tenantId && (
         <LeadDetail
