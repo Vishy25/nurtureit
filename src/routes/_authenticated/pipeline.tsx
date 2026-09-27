@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
+import { useWorkspaceConfig } from "@/lib/workspace-config";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/pipeline")({
 const STAGES = ["qualification", "discovery", "shortlist", "site_visit", "negotiation", "closing", "closed_won"] as const;
 type Stage = (typeof STAGES)[number];
 type State = "open" | "on_hold" | "nurturing" | "won" | "lost";
-const STAGE_LABEL: Record<Stage, string> = {
+const DEFAULT_STAGE_LABEL: Record<Stage, string> = {
   qualification: "Qualification confirmed",
   discovery: "Needs discovery completed",
   shortlist: "Property shortlist agreed",
@@ -41,6 +42,7 @@ const STAGE_LABEL: Record<Stage, string> = {
   closing: "Contract and closing preparation",
   closed_won: "Closed won",
 };
+const StageLabels = createContext<Record<Stage, string>>(DEFAULT_STAGE_LABEL);
 const STATE_LABEL: Record<State, string> = { open: "Open", on_hold: "On hold", nurturing: "Nurturing", won: "Won", lost: "Lost" };
 
 function money(v: number | null, cur: string) {
@@ -53,6 +55,8 @@ function PipelinePage() {
   const tenantId = currentTenant?.tenantId;
   const [openId, setOpenId] = useState<string | null>(null);
   const [showClosed, setShowClosed] = useState(false);
+  const { data: cfg } = useWorkspaceConfig(tenantId, currentTenant?.industry);
+  const STAGE_LABEL = cfg ? (Object.fromEntries(STAGES.map((s, i) => [s, cfg.stageLabels[i] ?? DEFAULT_STAGE_LABEL[s]])) as Record<Stage, string>) : DEFAULT_STAGE_LABEL;
   const { data: deals = [] } = useQuery({
     queryKey: ["opportunities", tenantId],
     enabled: !!tenantId,
@@ -66,7 +70,7 @@ function PipelinePage() {
   const selected = deals.find((d) => d.id === openId);
 
   return (
-    <>
+    <StageLabels.Provider value={STAGE_LABEL}>
       <PageHeader
         title="Pipeline"
         description="Deals move one stage at a time. Losing a deal needs a reason; on-hold and nurturing need a follow-up date."
@@ -108,7 +112,7 @@ function PipelinePage() {
           {selected && tenantId && <DealDetail deal={selected} tenantId={tenantId} />}
         </SheetContent>
       </Sheet>
-    </>
+    </StageLabels.Provider>
   );
 }
 
@@ -116,6 +120,7 @@ type Deal = { id: string; name: string; stage: string; state: string; value: num
 
 function DealDetail({ deal, tenantId }: { deal: Deal; tenantId: string }) {
   const qc = useQueryClient();
+  const STAGE_LABEL = useContext(StageLabels);
   const stage = deal.stage as Stage;
   const idx = STAGES.indexOf(stage);
   const [action, setAction] = useState<"lost" | "on_hold" | "nurturing" | null>(null);
