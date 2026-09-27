@@ -85,6 +85,7 @@ export type Database = {
       ai_agent_settings: {
         Row: {
           agent: string
+          autonomy: string
           enabled: boolean
           id: string
           prompt_version: string
@@ -95,6 +96,7 @@ export type Database = {
         }
         Insert: {
           agent: string
+          autonomy?: string
           enabled?: boolean
           id?: string
           prompt_version: string
@@ -105,6 +107,7 @@ export type Database = {
         }
         Update: {
           agent?: string
+          autonomy?: string
           enabled?: boolean
           id?: string
           prompt_version?: string
@@ -1820,6 +1823,7 @@ export type Database = {
         Row: {
           ai_autonomy: string
           ai_daily_run_limit: number
+          ai_monthly_run_budget: number
           ai_paused: boolean
           created_at: string
           created_by: string | null
@@ -1837,6 +1841,7 @@ export type Database = {
         Insert: {
           ai_autonomy?: string
           ai_daily_run_limit?: number
+          ai_monthly_run_budget?: number
           ai_paused?: boolean
           created_at?: string
           created_by?: string | null
@@ -1854,6 +1859,7 @@ export type Database = {
         Update: {
           ai_autonomy?: string
           ai_daily_run_limit?: number
+          ai_monthly_run_budget?: number
           ai_paused?: boolean
           created_at?: string
           created_by?: string | null
