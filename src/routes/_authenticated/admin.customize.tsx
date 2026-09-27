@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/lib/tenant-context";
 import { useWorkspaceConfig } from "@/lib/workspace-config";
 import { getTemplate } from "@/lib/industry-templates";
+import { ConfigVersions } from "@/components/config-versions";
 import { DEFAULT_SCORING, scoreLead, type ScoringConfig } from "@/lib/scoring";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ function CustomizePage() {
       <Scoring tenantId={currentTenant.tenantId} industry={currentTenant.industry} />
       <CustomFields tenantId={currentTenant.tenantId} industry={currentTenant.industry} />
       <CustomFields tenantId={currentTenant.tenantId} industry={currentTenant.industry} entity="contact" />
+      <ConfigVersions tenantId={currentTenant.tenantId} industry={currentTenant.industry} />
     </div>
   );
 }
