@@ -373,6 +373,44 @@ export type Database = {
           },
         ]
       }
+      app_errors: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          page: string | null
+          stack: string | null
+          tenant_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          page?: string | null
+          stack?: string | null
+          tenant_id?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          page?: string | null
+          stack?: string | null
+          tenant_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_errors_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attachments: {
         Row: {
           content_type: string | null
@@ -616,6 +654,53 @@ export type Database = {
           },
           {
             foreignKeyName: "buyer_preferences_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      config_versions: {
+        Row: {
+          created_at: string
+          created_by: string
+          custom_fields: Json
+          id: string
+          industry: string | null
+          label: string
+          scoring_config: Json | null
+          stage_labels: Json | null
+          tenant_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          custom_fields?: Json
+          id?: string
+          industry?: string | null
+          label: string
+          scoring_config?: Json | null
+          stage_labels?: Json | null
+          tenant_id: string
+          version: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          custom_fields?: Json
+          id?: string
+          industry?: string | null
+          label?: string
+          scoring_config?: Json | null
+          stage_labels?: Json | null
+          tenant_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "config_versions_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
