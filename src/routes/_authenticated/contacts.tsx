@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useWorkspaceConfig, cleanCustomValues } from "@/lib/workspace-config";
+import { CustomFieldInputs } from "@/components/custom-field-inputs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/contacts")({
@@ -128,6 +130,7 @@ function ContactsPage() {
           {selected && tenantId && user && (
             <>
               <SheetHeader><SheetTitle>{selected.name}</SheetTitle></SheetHeader>
+              {selected.type === "contact" && <ContactFields tenantId={tenantId} industry={currentTenant?.industry} contactId={selected.id} canEdit={canEdit} />}
               <Timeline tenantId={tenantId} userId={user.id} target={selected} canEdit={canEdit} />
             </>
           )}
@@ -230,16 +233,21 @@ function NewContactButton({ tenantId, userId, orgs }: { tenantId: string; userId
   const [open, setOpen] = useState(false);
   const empty = { full_name: "", email: "", phone: "", title: "", organization_id: "none", preferred_channel: "email", marketing_consent: "no", consent_source: "" };
   const [f, setF] = useState(empty);
+  const { currentTenant } = useTenant();
+  const cfg = useWorkspaceConfig(tenantId, currentTenant?.industry);
+  const cfields = cfg.data?.contactFields ?? [];
+  const [custom, setCustom] = useState<Record<string, unknown>>({});
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("contacts").insert({
+      const custom_fields = cleanCustomValues(cfields, custom);
+      const { error } = await (supabase as any).from("contacts").insert({ custom_fields,
         tenant_id: tenantId, full_name: f.full_name.trim(), email: f.email || null, phone: f.phone || null, title: f.title || null,
         organization_id: f.organization_id === "none" ? null : f.organization_id, preferred_channel: f.preferred_channel,
         marketing_consent: f.marketing_consent === "yes", consent_source: f.consent_source || null, owner_id: userId, created_by: userId,
       });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Contact added"); setOpen(false); setF(empty); void qc.invalidateQueries({ queryKey: ["contacts", tenantId] }); },
+    onSuccess: () => { toast.success("Contact added"); setOpen(false); setF(empty); setCustom({}); void qc.invalidateQueries({ queryKey: ["contacts", tenantId] }); },
     onError: (e: Error) => toast.error(e.message),
   });
   const inp = (k: "full_name" | "email" | "phone" | "title" | "consent_source", label: string) => (
@@ -277,9 +285,42 @@ function NewContactButton({ tenantId, userId, orgs }: { tenantId: string; userId
             </div>
             {inp("consent_source", "Consent source")}
           </div>
+          <CustomFieldInputs fields={cfields} values={custom} onChange={setCustom} />
           <DialogFooter><Button type="submit" disabled={save.isPending}>Add</Button></DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ContactFields({ tenantId, industry, contactId, canEdit }: { tenantId: string; industry?: string; contactId: string; canEdit: boolean }) {
+  const qc = useQueryClient();
+  const cfg = useWorkspaceConfig(tenantId, industry);
+  const fields = cfg.data?.contactFields ?? [];
+  const [values, setValues] = useState<Record<string, unknown> | null>(null);
+  const { data } = useQuery({
+    queryKey: ["contact-custom", contactId],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).from("contacts").select("custom_fields").eq("id", contactId).single();
+      if (error) throw error;
+      return (data?.custom_fields ?? {}) as Record<string, unknown>;
+    },
+  });
+  const save = useMutation({
+    mutationFn: async () => {
+      const custom_fields = { ...(data ?? {}), ...cleanCustomValues(fields, values ?? data ?? {}) };
+      const { error } = await (supabase as any).from("contacts").update({ custom_fields }).eq("id", contactId);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Saved"); setValues(null); void qc.invalidateQueries({ queryKey: ["contact-custom", contactId] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  if (!fields.length) return null;
+  return (
+    <div className="mt-4 space-y-2 rounded-md border p-3">
+      <p className="text-sm font-medium">Details</p>
+      <CustomFieldInputs fields={fields} values={values ?? data ?? {}} onChange={setValues} disabled={!canEdit} />
+      {canEdit && values && <Button size="sm" onClick={() => save.mutate()} disabled={save.isPending}>Save details</Button>}
+    </div>
   );
 }
