@@ -53,6 +53,19 @@ function TasksPage() {
     },
   });
 
+  const { data: templates = [] } = useQuery({
+    queryKey: ["task-templates", tenantId],
+    enabled: !!tenantId,
+    queryFn: async () => (await supabase.from("task_templates").select("id, title, kind, due_days").eq("tenant_id", tenantId!).order("title")).data ?? [],
+  });
+  function applyTemplate(id: string) {
+    const t = templates.find((x) => x.id === id);
+    if (!t) return;
+    setTitle(t.title); setKind(t.kind);
+    const d = new Date(Date.now() + t.due_days * 86400000);
+    setDue(new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16));
+  }
+
   const refresh = () => qc.invalidateQueries({ queryKey: ["tasks", tenantId] });
 
   const create = useMutation({
@@ -115,6 +128,12 @@ function TasksPage() {
             if (title.trim()) create.mutate();
           }}
         >
+          {templates.length > 0 && (
+            <select aria-label="Use a template" className="rounded-md border bg-background px-3 py-2 text-sm" value="" onChange={(e) => applyTemplate(e.target.value)}>
+              <option value="">Use a template…</option>
+              {templates.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+            </select>
+          )}
           <input
             className="min-w-60 flex-1 rounded-md border bg-background px-3 py-2 text-sm"
             placeholder="What needs doing?"

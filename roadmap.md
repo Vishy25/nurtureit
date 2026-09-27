@@ -63,7 +63,7 @@ Source: `docs/intelligence-brief.md`.
 ## Milestone 5 — Configuration
 
 - [x] Industry templates, terminology, typed custom fields, pipeline/stage configuration
-- [ ] Scoring rules, assignment policies, task templates, notifications, trigger-condition-action workflows
+- [x] Scoring rules, assignment policy (least-loaded rep, opt-in), task templates, trigger-condition-action workflows with notifications
 - [ ] Template versioning with safe stage mapping
 - [x] Software-sales template working without code changes (select in Settings)
 - [x] Starter templates: book sales, agriculture produce, retreat sales, senior living
@@ -96,4 +96,4 @@ Source: `docs/intelligence-brief.md`.
 - [x] Two-workspace isolation test with demo data (leads, contacts, tasks)
 - [x] Role-based dashboards: leads, conversions, pipeline stages, tasks, property activity
 
-## Current request (Sep 27, "implement them all") — batches 1–2 done; remaining: assignment policies/task templates, template versioning, pagination, monitoring, offline, security warnings, email invites
+## Current request (Sep 27, "implement them all") — batches 1–2 done; remaining: template versioning, pagination, monitoring, offline, security warnings, email invites
