@@ -139,7 +139,7 @@ export const generateBriefing = createServerFn({ method: "POST" })
       M2: { label: "New leads, previous 30 days", value: lPrev },
       M3: { label: "Leads converted, last 30 days", value: conv30 },
       M4: { label: "Open deals", value: open.length },
-      M5: { label: `Open pipeline value (${t.industry ? "" : ""}workspace currency)`, value: Math.round(sum(open)) },
+      M5: { label: "Open pipeline value (all currencies summed)", value: Math.round(sum(open)) },
       M6: { label: "Deals won, last 30 days", value: won30.length },
       M7: { label: "Value won, last 30 days", value: Math.round(sum(won30)) },
       M8: { label: "Deals lost, last 30 days", value: lost30.length },
