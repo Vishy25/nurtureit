@@ -1,5 +1,5 @@
 /** Registry of AI agents. Client-safe: no prompts or secrets. */
-export type AgentId = "lead_qualification" | "deal_health";
+export type AgentId = "lead_qualification" | "deal_health" | "executive_briefing";
 
 export type AgentDef = {
   id: AgentId;
@@ -30,14 +30,26 @@ export const AGENTS: AgentDef[] = [
   {
     id: "deal_health",
     name: "Deal health",
-    objective: "Flag stalled or at-risk deals and suggest recovery steps.",
-    allowedActions: ["Read deals and their history"],
-    requiresApproval: ["All actions"],
-    readScope: "Deals the requesting person can see.",
-    promptVersion: "deal-health-v0",
-    model: "openai/gpt-6-astra",
-    budget: { maxRunsPerDay: "Workspace daily limit", timeout: "—" },
-    availability: "planned",
+    objective: "Explain why a deal may stall, citing its history, and suggest up to three recovery steps.",
+    allowedActions: ["Read the deal it was asked about, its stage history, activities and tasks"],
+    requiresApproval: ["Turning any recovery step into a task"],
+    readScope: "Only the deal the requesting person can already see.",
+    promptVersion: "deal-health-v1",
+    model: "openai/gpt-6-sol",
+    budget: { maxRunsPerDay: "Workspace daily limit", timeout: "One request, fallback provider on outage" },
+    availability: "available",
+  },
+  {
+    id: "executive_briefing",
+    name: "Executive briefing",
+    objective: "Narrate workspace metrics in plain language; every point must cite a computed metric.",
+    allowedActions: ["Read aggregate metrics computed by the app"],
+    requiresApproval: ["None — read-only, never changes data"],
+    readScope: "Aggregate counts the requesting admin, manager or analyst can already see.",
+    promptVersion: "exec-brief-v1",
+    model: "openai/gpt-6-sol",
+    budget: { maxRunsPerDay: "Workspace daily limit", timeout: "One request, fallback provider on outage" },
+    availability: "available",
   },
 ];
 
