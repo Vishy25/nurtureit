@@ -10,6 +10,7 @@ const TABS = [
   { to: "/admin/settings", label: "Workspace settings" },
   { to: "/admin/customize", label: "Customize" },
   { to: "/admin/ai", label: "AI assistant" },
+  { to: "/admin/automations", label: "Automations" },
 ] as const;
 
 export const Route = createFileRoute("/_authenticated/admin")({
