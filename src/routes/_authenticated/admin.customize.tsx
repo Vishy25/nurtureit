@@ -41,6 +41,7 @@ function CustomizePage() {
       <StageLabels tenantId={currentTenant.tenantId} industry={currentTenant.industry} />
       <Scoring tenantId={currentTenant.tenantId} industry={currentTenant.industry} />
       <CustomFields tenantId={currentTenant.tenantId} industry={currentTenant.industry} />
+      <CustomFields tenantId={currentTenant.tenantId} industry={currentTenant.industry} entity="contact" />
     </div>
   );
 }
@@ -138,10 +139,10 @@ function Scoring({ tenantId, industry }: { tenantId: string; industry: string })
   );
 }
 
-function CustomFields({ tenantId, industry }: { tenantId: string; industry: string }) {
+function CustomFields({ tenantId, industry, entity = "lead" }: { tenantId: string; industry: string; entity?: "lead" | "contact" }) {
   const qc = useQueryClient();
   const { data } = useWorkspaceConfig(tenantId, industry);
-  const fields = data?.fields ?? [];
+  const fields = (entity === "lead" ? data?.fields : data?.contactFields) ?? [];
   const [f, setF] = useState({ label: "", field_type: "text", options: "", required: false });
   const add = useMutation({
     mutationFn: async () => {
@@ -149,7 +150,7 @@ function CustomFields({ tenantId, industry }: { tenantId: string; industry: stri
       if (!key) throw new Error("Enter a label");
       const options = f.field_type === "select" ? f.options.split(",").map((o) => o.trim()).filter(Boolean) : [];
       if (f.field_type === "select" && options.length < 2) throw new Error("Add at least two options, separated by commas");
-      const { error } = await (supabase as any).from("custom_field_defs").insert({ tenant_id: tenantId, field_key: key, label: f.label.trim(), field_type: f.field_type, options, required: f.required, position: fields.length });
+      const { error } = await (supabase as any).from("custom_field_defs").insert({ tenant_id: tenantId, entity, field_key: key, label: f.label.trim(), field_type: f.field_type, options, required: f.required, position: fields.length });
       if (error) throw new Error(error.code === "23505" ? "A field with that name already exists" : error.message);
     },
     onSuccess: () => { setF({ label: "", field_type: "text", options: "", required: false }); qc.invalidateQueries({ queryKey: ["workspace-config", tenantId] }); },
@@ -163,8 +164,8 @@ function CustomFields({ tenantId, industry }: { tenantId: string; industry: stri
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-display text-lg">Custom lead fields</CardTitle>
-        <CardDescription>Extra fields shown on the new-lead form and in each lead's panel. Removing a field hides it; values already saved are kept.</CardDescription>
+        <CardTitle className="font-display text-lg">Custom {entity} fields</CardTitle>
+        <CardDescription>{entity === "lead" ? "Extra fields shown on the new-lead form and in each lead's panel." : "Extra fields shown on the new-contact form and in each contact's panel."} Removing a field hides it; values already saved are kept.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="divide-y rounded border text-sm">
