@@ -40,7 +40,7 @@ function ReportsPage() {
   const { currentTenant, role } = useTenant();
   const tenantId = currentTenant?.tenantId;
   const currency = currentTenant?.defaultCurrency ?? "USD";
-  const config = useWorkspaceConfig();
+  const { data: config } = useWorkspaceConfig(tenantId, currentTenant?.industry);
   const qc = useQueryClient();
   const canSetTargets = role === "tenant_admin" || role === "sales_manager";
   const canSnapshot = canSetTargets || role === "analyst";
@@ -87,7 +87,7 @@ function ReportsPage() {
       { tenant_id: tenantId!, period_month: month, revenue_target: Number(rev || data.data?.target?.revenue_target || 0), deals_target: Number(deals || data.data?.target?.deals_target || 0) },
       { onConflict: "tenant_id,period_month" },
     );
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Target saved");
     setRev(""); setDeals("");
     qc.invalidateQueries({ queryKey: ["reports"] });
@@ -98,7 +98,7 @@ function ReportsPage() {
     const { error } = await supabase.from("forecast_snapshots").insert({
       tenant_id: tenantId!, open_value: d.openValue, weighted_value: d.weighted, won_value_month: d.wonValue, open_count: d.openCount,
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Forecast snapshot saved");
     qc.invalidateQueries({ queryKey: ["reports"] });
   }
@@ -141,7 +141,7 @@ function ReportsPage() {
                 <thead><tr className="text-left text-muted-foreground"><th>Stage</th><th>Deals</th><th>Value</th><th>Prob.</th><th>Weighted</th></tr></thead>
                 <tbody>
                   {d.byStage.map((s, i) => (
-                    <tr key={s.stage} className="border-t"><td>{config.stageLabels?.[i] ?? s.stage}</td><td>{s.count}</td><td>{fmt(s.value)}</td><td>{Math.round(STAGE_PROBABILITY[s.stage]! * 100)}%</td><td>{fmt(s.weighted)}</td></tr>
+                    <tr key={s.stage} className="border-t"><td>{config?.stageLabels?.[i] ?? s.stage}</td><td>{s.count}</td><td>{fmt(s.value)}</td><td>{Math.round(STAGE_PROBABILITY[s.stage]! * 100)}%</td><td>{fmt(s.weighted)}</td></tr>
                   ))}
                 </tbody>
               </table>
