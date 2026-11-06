@@ -22,3 +22,5 @@
 
 - RLS policies check membership via `tenant_id IN (SELECT private.my_tenants(roles))`; security-definer helpers live in schema `private`. Why: evaluated once per query (40x faster at 50k rows) and not callable from the public API.
 - Offline writes for tasks/site visits go through `queueOp` in `src/lib/offline-queue.ts` (client ids + upsert). Why: safe retries without duplicates.
+- External CRM APIs live under `/api/crm/v1` with hashed expiring workspace keys and explicit scopes; privileged reads and writes must derive tenant from the verified credential and validate every relationship. Why: external integrations cannot rely on browser sessions or bypass tenant isolation.
+- Property enquiries are created by a transactional RPC; outbound events are inserted by database triggers and delivered through a leased outbox using Standard Webhooks signatures. Why: repeat enquiries are preserved and failed delivery never loses a committed change.

@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { CrmIntegrationControls } from "@/components/crm-integration-controls";
 
 export const Route = createFileRoute("/_authenticated/integrations")({
   head: () => ({
@@ -20,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/integrations")({
       { name: "description", content: "Lead intake keys, incoming event log and failed-event review queue." },
       { property: "og:title", content: "Integrations — SalesOS" },
       { property: "og:description", content: "Lead intake keys and event log." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: IntegrationsPage,
@@ -82,6 +85,7 @@ function IntegrationsPage() {
   return (
     <>
       <PageHeader title="Integrations" description="Send leads in from websites, portals and partners. New leads wait for a manager to assign them." />
+      {isAdmin && <CrmIntegrationControls tenantId={tenantId} key={tenantId} />}
       {isAdmin && (
         <Card className="mb-6">
           <CardHeader>
