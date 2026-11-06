@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_authenticated/admin/audit")({
       { name: "description", content: "Who changed what, and when, inside your workspace." },
       { property: "og:title", content: "Audit history — SalesOS" },
       { property: "og:description", content: "Who changed what, and when." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuditPage,

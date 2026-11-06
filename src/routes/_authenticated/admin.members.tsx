@@ -31,6 +31,8 @@ export const Route = createFileRoute("/_authenticated/admin/members")({
       { name: "description", content: "Invite colleagues, set roles and deactivate access in your workspace." },
       { property: "og:title", content: "People & roles — SalesOS" },
       { property: "og:description", content: "Invite colleagues and manage roles." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: MembersPage,
