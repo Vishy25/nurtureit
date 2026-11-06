@@ -33,6 +33,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminWorkspacesRouteImport } from './routes/_authenticated/admin.workspaces'
 import { Route as ApiCrmV1SplatRouteImport } from './routes/api/crm/v1/$'
 import { Route as ApiPublicCrmDispatchRouteImport } from './routes/api/public/crm/dispatch'
+import { Route as ApiPublicCrmReconcileRouteImport } from './routes/api/public/crm/reconcile'
 import { Route as ApiPublicIntakeV1LeadsRouteImport } from './routes/api/public/intake/v1/leads'
 
 const IndexRoute = IndexRouteImport.update({
@@ -161,6 +162,11 @@ const ApiPublicCrmDispatchRoute = ApiPublicCrmDispatchRouteImport.update({
   path: '/api/public/crm/dispatch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCrmReconcileRoute = ApiPublicCrmReconcileRouteImport.update({
+  id: '/api/public/crm/reconcile',
+  path: '/api/public/crm/reconcile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicIntakeV1LeadsRoute = ApiPublicIntakeV1LeadsRouteImport.update({
   id: '/api/public/intake/v1/leads',
   path: '/api/public/intake/v1/leads',
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/crm/v1/$': typeof ApiCrmV1SplatRoute
   '/api/public/crm/dispatch': typeof ApiPublicCrmDispatchRoute
+  '/api/public/crm/reconcile': typeof ApiPublicCrmReconcileRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
 }
 export interface FileRoutesByTo {
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/crm/v1/$': typeof ApiCrmV1SplatRoute
   '/api/public/crm/dispatch': typeof ApiPublicCrmDispatchRoute
+  '/api/public/crm/reconcile': typeof ApiPublicCrmReconcileRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
 }
 export interface FileRoutesById {
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/crm/v1/$': typeof ApiCrmV1SplatRoute
   '/api/public/crm/dispatch': typeof ApiPublicCrmDispatchRoute
+  '/api/public/crm/reconcile': typeof ApiPublicCrmReconcileRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
 }
 export interface FileRouteTypes {
@@ -272,6 +281,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/api/crm/v1/$'
     | '/api/public/crm/dispatch'
+    | '/api/public/crm/reconcile'
     | '/api/public/intake/v1/leads'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/api/crm/v1/$'
     | '/api/public/crm/dispatch'
+    | '/api/public/crm/reconcile'
     | '/api/public/intake/v1/leads'
   id:
     | '__root__'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/api/crm/v1/$'
     | '/api/public/crm/dispatch'
+    | '/api/public/crm/reconcile'
     | '/api/public/intake/v1/leads'
   fileRoutesById: FileRoutesById
 }
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ApiCrmV1SplatRoute: typeof ApiCrmV1SplatRoute
   ApiPublicCrmDispatchRoute: typeof ApiPublicCrmDispatchRoute
+  ApiPublicCrmReconcileRoute: typeof ApiPublicCrmReconcileRoute
   ApiPublicIntakeV1LeadsRoute: typeof ApiPublicIntakeV1LeadsRoute
 }
 
@@ -506,6 +519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCrmDispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/crm/reconcile': {
+      id: '/api/public/crm/reconcile'
+      path: '/api/public/crm/reconcile'
+      fullPath: '/api/public/crm/reconcile'
+      preLoaderRoute: typeof ApiPublicCrmReconcileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/intake/v1/leads': {
       id: '/api/public/intake/v1/leads'
       path: '/api/public/intake/v1/leads'
@@ -578,6 +598,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiCrmV1SplatRoute: ApiCrmV1SplatRoute,
   ApiPublicCrmDispatchRoute: ApiPublicCrmDispatchRoute,
+  ApiPublicCrmReconcileRoute: ApiPublicCrmReconcileRoute,
   ApiPublicIntakeV1LeadsRoute: ApiPublicIntakeV1LeadsRoute,
 }
 export const routeTree = rootRouteImport

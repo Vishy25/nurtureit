@@ -2478,6 +2478,7 @@ export type Database = {
         Args: { _actor: string; _body: Json; _score: number; _tenant: string }
         Returns: Json
       }
+      crm_wake_pending: { Args: never; Returns: undefined }
       ensure_profile: { Args: never; Returns: undefined }
       has_tenant_role: {
         Args: {

@@ -15,6 +15,13 @@
       "when": 1793944263754,
       "tag": "0001_crm_webhook_wake",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793944388437,
+      "tag": "0002_crm_delivery_recovery",
+      "breakpoints": true
     }
   ]
 }
