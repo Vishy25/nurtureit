@@ -57,14 +57,14 @@ suite('connected website → CRM workflow',()=>{
  const original=globalThis.fetch;let received=0;let reject=true;
  globalThis.fetch=(async(input:RequestInfo|URL,init?:RequestInit)=>{
  const url=String(input);if(url.startsWith('https://cloudflare-dns.com/'))return Response.json({Answer:[{type:1,data:'93.184.216.34'}]});
- if(url==='https://receiver.company.com/events'){const headers=new Headers(init?.headers);new Webhook(secret).verify(String(init?.body),{'webhook-id':headers.get('webhook-id')??'','webhook-timestamp':headers.get('webhook-timestamp')??'','webhook-signature':headers.get('webhook-signature')??''});received++;return new Response('',{status:reject?503:200});}
  return original(input,init);
  }) as typeof fetch;
+ const send=async(url:string,address:string,body:string,headers:Record<string,string>)=>{expect(url).toBe('https://receiver.company.com/events');expect(address).toBe('93.184.216.34');new Webhook(secret).verify(body,headers);received++;return reject?503:200;};
  try{
- await dispatchWebhooks(admin,A.tenantId);
+ await dispatchWebhooks(admin,A.tenantId,send);
  let {data:deliveries}=await admin.from('crm_deliveries').select('*').eq('webhook_id',hook.id);expect(deliveries?.[0]?.status).toBe('pending');expect(deliveries?.[0]?.attempts).toBe(1);
  await admin.from('crm_deliveries').update({next_attempt_at:new Date().toISOString()}).eq('webhook_id',hook.id);reject=false;
- await dispatchWebhooks(admin,A.tenantId);
+ await dispatchWebhooks(admin,A.tenantId,send);
  ({data:deliveries}=await admin.from('crm_deliveries').select('*').eq('webhook_id',hook.id));expect(deliveries?.[0]?.status).toBe('delivered');expect(deliveries?.[0]?.attempts).toBe(2);expect(received).toBe(2);
  }finally{globalThis.fetch=original;await admin.from('crm_webhooks').update({enabled:false}).eq('id',hook.id);}
  });
