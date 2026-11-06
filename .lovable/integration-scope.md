@@ -1,0 +1,2 @@
+# CRM integration scope
+Authenticated external /api/crm/v1 routes with per-workspace scoped credentials, read/list/patch for leads, contacts, organizations, opportunities, properties, tasks and enquiries; transactional structured enquiries, external references and explicit owner mapping; transactional outbound outbox with signed delivery and bounded retries; administrator controls; concrete security and connected workflow tests plus developer contract.
