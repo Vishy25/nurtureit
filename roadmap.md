@@ -101,3 +101,10 @@ Source: `docs/intelligence-brief.md`.
 - [x] Security warnings resolved (helpers moved to private schema)
 - [x] Load test 50k leads: all key queries <60 ms after RLS optimization (docs/operations.md)
 - [ ] Email invites — waiting on DNS NS records for eranki.aimach.net
+
+## CRM integration completion (Nov 6, 2026)
+- [x] Scoped authenticated read/update APIs, pagination, external-ID lookups and owner mapping
+- [x] Transactional property enquiries with repeat-enquiry preservation and idempotency
+- [x] Signed outbound webhooks, durable delivery/retries and administrator controls
+- [x] Local end-to-end workflow and access-control tests (33 passing); developer contract in docs/crm-integration-api.md
+- [ ] Team production acceptance — publish release and provide the real webhook receiver/website field mapping; local tests do not verify published routing or production webhook transport

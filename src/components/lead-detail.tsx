@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Attachments } from "@/components/attachments";
 import { AiLeadAssistant } from "@/components/ai-lead-assistant";
+import { LeadEnquiries } from "@/components/lead-enquiries";
 import { CustomFieldInputs } from "@/components/custom-field-inputs";
 import { useWorkspaceConfig, cleanCustomValues } from "@/lib/workspace-config";
 import { scoreLead } from "@/lib/scoring";
@@ -224,6 +225,7 @@ export function LeadDetail({
                 )}
               </div>
             )}
+            <LeadEnquiries tenantId={tenantId} leadId={lead.id} />
             <div className="mt-6 border-t pt-4">
               <AiLeadAssistant leadId={lead.id} tenantId={tenantId} canAct={canEdit} />
             </div>

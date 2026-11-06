@@ -797,6 +797,239 @@ export type Database = {
           },
         ]
       }
+      crm_credentials: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          key_hash: string
+          key_prefix: string
+          name: string
+          request_count: number
+          revoked_at: string | null
+          scopes: string[]
+          tenant_id: string
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at: string
+          id?: string
+          key_hash: string
+          key_prefix: string
+          name: string
+          request_count?: number
+          revoked_at?: string | null
+          scopes: string[]
+          tenant_id: string
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          name?: string
+          request_count?: number
+          revoked_at?: string | null
+          scopes?: string[]
+          tenant_id?: string
+          window_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_credentials_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          last_status: number | null
+          locked_until: string | null
+          next_attempt_at: string
+          payload: Json
+          status: string
+          tenant_id: string
+          webhook_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          event_id: string
+          event_type: string
+          id?: string
+          last_error?: string | null
+          last_status?: number | null
+          locked_until?: string | null
+          next_attempt_at?: string
+          payload: Json
+          status?: string
+          tenant_id: string
+          webhook_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          event_id?: string
+          event_type?: string
+          id?: string
+          last_error?: string | null
+          last_status?: number | null
+          locked_until?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          status?: string
+          tenant_id?: string
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_deliveries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_deliveries_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "crm_webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_external_ids: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          external_id: string
+          id: string
+          source_system: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          external_id: string
+          id?: string
+          source_system: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          external_id?: string
+          id?: string
+          source_system?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_external_ids_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_owner_mappings: {
+        Row: {
+          external_owner_id: string
+          id: string
+          source_system: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          external_owner_id: string
+          id?: string
+          source_system: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          external_owner_id?: string
+          id?: string
+          source_system?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_owner_mappings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_webhooks: {
+        Row: {
+          created_at: string
+          created_by: string
+          enabled: boolean
+          events: string[]
+          id: string
+          name: string
+          signing_secret: string
+          tenant_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          enabled?: boolean
+          events: string[]
+          id?: string
+          name: string
+          signing_secret: string
+          tenant_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          enabled?: boolean
+          events?: string[]
+          id?: string
+          name?: string
+          signing_secret?: string
+          tenant_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_webhooks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       custom_field_defs: {
         Row: {
           created_at: string
@@ -841,6 +1074,99 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      enquiries: {
+        Row: {
+          budget: number | null
+          contact_id: string | null
+          created_at: string
+          created_by: string
+          custom_fields: Json
+          external_id: string
+          id: string
+          lead_id: string
+          message: string | null
+          opportunity_id: string | null
+          property_id: string
+          source_system: string
+          status: string
+          tenant_id: string
+          timeline: string | null
+          updated_at: string
+        }
+        Insert: {
+          budget?: number | null
+          contact_id?: string | null
+          created_at?: string
+          created_by: string
+          custom_fields?: Json
+          external_id: string
+          id?: string
+          lead_id: string
+          message?: string | null
+          opportunity_id?: string | null
+          property_id: string
+          source_system: string
+          status?: string
+          tenant_id: string
+          timeline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          budget?: number | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          custom_fields?: Json
+          external_id?: string
+          id?: string
+          lead_id?: string
+          message?: string | null
+          opportunity_id?: string | null
+          property_id?: string
+          source_system?: string
+          status?: string
+          tenant_id?: string
+          timeline?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enquiries_tenant_id_contact_id_fkey"
+            columns: ["tenant_id", "contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "enquiries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiries_tenant_id_lead_id_fkey"
+            columns: ["tenant_id", "lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "enquiries_tenant_id_opportunity_id_fkey"
+            columns: ["tenant_id", "opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["tenant_id", "id"]
+          },
+          {
+            foreignKeyName: "enquiries_tenant_id_property_id_fkey"
+            columns: ["tenant_id", "property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["tenant_id", "id"]
           },
         ]
       }
@@ -2099,6 +2425,60 @@ export type Database = {
         Args: { _industry?: string; _is_demo?: boolean; _name: string }
         Returns: string
       }
+      crm_authenticate: {
+        Args: { _hash: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          key_hash: string
+          key_prefix: string
+          name: string
+          request_count: number
+          revoked_at: string | null
+          scopes: string[]
+          tenant_id: string
+          window_start: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "crm_credentials"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      crm_claim_deliveries: {
+        Args: { _tenant?: string }
+        Returns: {
+          attempts: number
+          created_at: string
+          delivered_at: string | null
+          event_id: string
+          event_type: string
+          id: string
+          last_error: string | null
+          last_status: number | null
+          locked_until: string | null
+          next_attempt_at: string
+          payload: Json
+          status: string
+          tenant_id: string
+          webhook_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "crm_deliveries"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      crm_consume_wake: { Args: { _hash: string }; Returns: boolean }
+      crm_create_enquiry: {
+        Args: { _actor: string; _body: Json; _score: number; _tenant: string }
+        Returns: Json
+      }
+      crm_wake_pending: { Args: never; Returns: undefined }
       ensure_profile: { Args: never; Returns: undefined }
       has_tenant_role: {
         Args: {

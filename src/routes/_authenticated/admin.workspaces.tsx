@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/admin/workspaces")({
       { name: "description", content: "Switch between businesses, create a workspace, or accept an invitation." },
       { property: "og:title", content: "Workspaces — SalesOS" },
       { property: "og:description", content: "Switch, create or join a workspace." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: WorkspacesPage,

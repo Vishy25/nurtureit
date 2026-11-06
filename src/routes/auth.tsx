@@ -18,6 +18,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to SalesOS, the multi-tenant sales CRM workspace." },
       { property: "og:title", content: "Sign in — SalesOS" },
       { property: "og:description", content: "Sign in to your SalesOS sales workspace." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,

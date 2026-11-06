@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793944145522,
+      "tag": "0000_crm_integration",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793944263754,
+      "tag": "0001_crm_webhook_wake",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793944388437,
+      "tag": "0002_crm_delivery_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793944695240,
+      "tag": "0003_crm_outbox_privacy_and_conversion",
+      "breakpoints": true
+    }
+  ]
+}

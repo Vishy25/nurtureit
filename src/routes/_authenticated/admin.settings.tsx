@@ -17,6 +17,8 @@ export const Route = createFileRoute("/_authenticated/admin/settings")({
       { name: "description", content: "Choose your industry template and AI autonomy level." },
       { property: "og:title", content: "Workspace settings — SalesOS" },
       { property: "og:description", content: "Industry template and AI autonomy." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SettingsPage,

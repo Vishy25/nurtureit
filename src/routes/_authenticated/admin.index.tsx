@@ -34,6 +34,8 @@ export const Route = createFileRoute("/_authenticated/admin/")({
       { name: "description", content: "Roles, permissions and workspace configuration in SalesOS." },
       { property: "og:title", content: "Administration — SalesOS" },
       { property: "og:description", content: "Roles, permissions and workspace configuration." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AdminOverview,
