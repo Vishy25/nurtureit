@@ -2473,6 +2473,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      crm_consume_wake: { Args: { _hash: string }; Returns: boolean }
       crm_create_enquiry: {
         Args: { _actor: string; _body: Json; _score: number; _tenant: string }
         Returns: Json
