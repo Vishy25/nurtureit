@@ -64,7 +64,12 @@ export async function handleCrm(request:Request,path:string) {
  const limit=z.coerce.number().int().min(1).max(100).parse(url.searchParams.get('limit')??50);
  const offset=z.coerce.number().int().min(0).max(1000000).parse(url.searchParams.get('offset')??0);
  let q=admin.from(entity).select('*').eq('tenant_id',tenantId).order('id').range(offset,offset+limit);
- const lead=url.searchParams.get('lead_id');if(lead && entity==='enquiries')q=q.eq('lead_id',z.string().uuid().parse(lead));
+ const lead=url.searchParams.get('lead_id');
+ if(lead && entity==='enquiries') {
+ const {data,error}=await admin.from('enquiries').select('*').eq('tenant_id',tenantId).eq('lead_id',z.string().uuid().parse(lead)).order('id').range(offset,offset+limit);
+ if(error)throw new ApiError(500,'Could not read enquiries');
+ return reply({data:data?.slice(0,limit)??[],next_offset:(data?.length??0)>limit?offset+limit:null});
+ }
  const {data,error}=await q;if(error)throw new ApiError(500,'Could not read records');
  return reply({data:data?.slice(0,limit)??[],next_offset:(data?.length??0)>limit?offset+limit:null});
  }
@@ -84,7 +89,8 @@ export async function handleCrm(request:Request,path:string) {
  for(const [field,type] of Object.entries(relations)){if(typeof p[field]==='string')await target(admin,tenantId,type,String(p[field]));}
  if(typeof p['email']==='string')p['email']=normalizeEmail(p['email']);if(typeof p['phone']==='string')p['phone']=normalizePhone(p['phone']);
  if(entity==='tasks' && p['status'])p['completed_at']=p['status']==='completed'?new Date().toISOString():null;
- const {data,error}=await admin.from(entity).update(p).eq('tenant_id',tenantId).eq('id',id).select('*').single();
+ // The entity-specific strict schema above validates the dynamic update payload.
+ const {data,error}=await (admin as SupabaseClient).from(entity).update(p).eq('tenant_id',tenantId).eq('id',id).select('*').single();
  if(error)throw new ApiError(422,'Update rejected by CRM validation');
  await admin.from('audit_events').insert({tenant_id:tenantId,actor_id:cred.created_by,action:'crm.api.updated',entity_type:entity,entity_id:id,metadata:{credential_id:cred.id,fields:Object.keys(p)}});
  return reply({data});

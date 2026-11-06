@@ -8,4 +8,4 @@ export const Route=createFileRoute('/api/public/crm/dispatch')({server:{handlers
  if(error || !data)return new Response('Unauthorized',{status:401});
  const {dispatchWebhooks}=await import('@/lib/crm-webhooks.server');await dispatchWebhooks(admin);
  return Response.json({accepted:true});
-}}});
+}}}});
