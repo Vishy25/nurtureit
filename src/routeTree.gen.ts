@@ -31,6 +31,7 @@ import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminMonitoringRouteImport } from './routes/_authenticated/admin.monitoring'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminWorkspacesRouteImport } from './routes/_authenticated/admin.workspaces'
+import { Route as ApiCrmV1SplatRouteImport } from './routes/api/crm/v1/$'
 import { Route as ApiPublicIntakeV1LeadsRouteImport } from './routes/api/public/intake/v1/leads'
 
 const IndexRoute = IndexRouteImport.update({
@@ -149,6 +150,11 @@ const AuthenticatedAdminWorkspacesRoute =
     path: '/workspaces',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const ApiCrmV1SplatRoute = ApiCrmV1SplatRouteImport.update({
+  id: '/api/crm/v1/$',
+  path: '/api/crm/v1/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicIntakeV1LeadsRoute = ApiPublicIntakeV1LeadsRouteImport.update({
   id: '/api/public/intake/v1/leads',
   path: '/api/public/intake/v1/leads',
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/crm/v1/$': typeof ApiCrmV1SplatRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
 }
 export interface FileRoutesByTo {
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/crm/v1/$': typeof ApiCrmV1SplatRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
 }
 export interface FileRoutesById {
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/workspaces': typeof AuthenticatedAdminWorkspacesRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/crm/v1/$': typeof ApiCrmV1SplatRoute
   '/api/public/intake/v1/leads': typeof ApiPublicIntakeV1LeadsRoute
 }
 export interface FileRouteTypes {
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/workspaces'
     | '/admin/'
+    | '/api/crm/v1/$'
     | '/api/public/intake/v1/leads'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/workspaces'
     | '/admin'
+    | '/api/crm/v1/$'
     | '/api/public/intake/v1/leads'
   id:
     | '__root__'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/workspaces'
     | '/_authenticated/admin/'
+    | '/api/crm/v1/$'
     | '/api/public/intake/v1/leads'
   fileRoutesById: FileRoutesById
 }
@@ -307,6 +319,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiCrmV1SplatRoute: typeof ApiCrmV1SplatRoute
   ApiPublicIntakeV1LeadsRoute: typeof ApiPublicIntakeV1LeadsRoute
 }
 
@@ -466,6 +479,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminWorkspacesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/api/crm/v1/$': {
+      id: '/api/crm/v1/$'
+      path: '/api/crm/v1/$'
+      fullPath: '/api/crm/v1/$'
+      preLoaderRoute: typeof ApiCrmV1SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/intake/v1/leads': {
       id: '/api/public/intake/v1/leads'
       path: '/api/public/intake/v1/leads'
@@ -536,6 +556,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiCrmV1SplatRoute: ApiCrmV1SplatRoute,
   ApiPublicIntakeV1LeadsRoute: ApiPublicIntakeV1LeadsRoute,
 }
 export const routeTree = rootRouteImport
