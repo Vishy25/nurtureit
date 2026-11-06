@@ -8,13 +8,13 @@ export async function assertPublicDestination(raw:string) {
  const response=await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(host)}&type=${type}`,{headers:{accept:'application/dns-json'},signal:AbortSignal.timeout(5000)});
  if(!response.ok)throw new Error('DNS validation unavailable');
  const data=await response.json() as {Answer?:{type:number,data:string}[]};
- for(const answer of data.Answer??[]){if(answer.type===1){const parts=answer.data.split('.').map(Number);const [a,b]=parts;if(a===0||a===10||a===127||a===169&&b===254||a===172&&b>=16&&b<=31||a===192&&b===168||a===100&&b>=64&&b<=127||a>=224)throw new Error('Private destination rejected');}
+ for(const answer of data.Answer??[]){if(answer.type===1){const parts=answer.data.split('.').map(Number);const a=parts[0];const b=parts[1];if(a===undefined||b===undefined||a===0||a===10||a===127||a===169&&b===254||a===172&&b>=16&&b<=31||a===192&&b===168||a===100&&b>=64&&b<=127||a>=224)throw new Error('Private destination rejected');}
  if(answer.type===28 && !/^2[0-9a-f]{3}:/i.test(answer.data))throw new Error('Private IPv6 destination rejected');}
  }
  return url;
 }
 export async function dispatchWebhooks(admin:SupabaseClient<Database>,tenant?:string) {
- const {data:jobs,error}=await admin.rpc('crm_claim_deliveries',{_tenant:tenant});if(error)throw error;
+ const {data:jobs,error}=await admin.rpc('crm_claim_deliveries',tenant?{_tenant:tenant}:{});if(error)throw error;
  for(const job of jobs??[]){
  try{
  const {data:hook}=await admin.from('crm_webhooks').select('*').eq('id',job.webhook_id).eq('tenant_id',job.tenant_id).single();
