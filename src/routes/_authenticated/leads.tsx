@@ -80,10 +80,11 @@ function LeadsPage() {
     queryKey: ["leads", tenantId, pageLimit],
     enabled: !!tenantId,
     queryFn: async () => {
+      if (!tenantId) return { rows: [], total: 0 };
       const { data, error, count } = await supabase
         .from("leads")
         .select("*", { count: "exact" })
-        .eq("tenant_id", tenantId!)
+        .eq("tenant_id", tenantId)
         .order("created_at", { ascending: false })
         .range(0, pageLimit - 1);
       if (error) throw error;
@@ -92,6 +93,16 @@ function LeadsPage() {
   });
   const leads = leadPage?.rows ?? [];
   const totalLeads = leadPage?.total ?? 0;
+  const { data: selectedLead } = useQuery({
+    queryKey: ["leads", tenantId, "detail", selectedId],
+    enabled: Boolean(tenantId && selectedId),
+    queryFn: async () => {
+      if (!tenantId || !selectedId) return null;
+      const { data, error } = await supabase.from("leads").select("*").eq("tenant_id", tenantId).eq("id", selectedId).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: Status }) => {
@@ -297,7 +308,7 @@ function LeadsPage() {
       </div>
       {tenantId && (
         <LeadDetail
-          lead={leads.find((l) => l.id === selectedId) ?? null}
+          lead={selectedLead ?? leads.find((l) => l.id === selectedId) ?? null}
           tenantId={tenantId}
           canEdit={canCreate}
           canAssign={allows("records.assign")}
