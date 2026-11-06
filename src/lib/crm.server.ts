@@ -88,7 +88,10 @@ export async function handleCrm(request:Request,path:string) {
  const relations:Record<string,typeof entities[number]>={lead_id:'leads',contact_id:'contacts',organization_id:'organizations',opportunity_id:'opportunities'};
  for(const [field,type] of Object.entries(relations)){if(typeof p[field]==='string')await target(admin,tenantId,type,String(p[field]));}
  if(typeof p['email']==='string')p['email']=normalizeEmail(p['email']);if(typeof p['phone']==='string')p['phone']=normalizePhone(p['phone']);
- if(entity==='tasks' && p['status'])p['completed_at']=p['status']==='completed'?new Date().toISOString():null;
+ if(entity==='tasks' && p['status']){
+ if(p['status']==='completed')p['status']='done';
+ p['completed_at']=p['status']==='done'?new Date().toISOString():null;
+ }
  // The entity-specific strict schema above validates the dynamic update payload.
  const {data,error}=await (admin as SupabaseClient).from(entity).update(p).eq('tenant_id',tenantId).eq('id',id).select('*').single();
  if(error)throw new ApiError(422,'Update rejected by CRM validation');
