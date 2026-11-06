@@ -10,6 +10,6 @@ describe('CRM integration safety',()=>{
  it('write keys cannot assign',()=>expect(canScope(['crm:write'],'crm:assign')).toBe(false));
  it('commercial closure is not an unrestricted API patch',()=>expect(patches.opportunities.safeParse({state:'won',stage:'closed_won'}).success).toBe(false));
  it.each(['http://receiver.com','https://127.0.0.1','https://receiver.local','https://receiver.com:8443','https://user:pass@receiver.com'])('rejects unsafe destinations %s',url=>expect(()=>webhookUrl(url)).toThrow());
- it('verifies signatures and rejects tampering',()=>{const w=new Webhook(new Uint8Array(32).fill(3));const body=JSON.stringify({type:'enquiries.created'});const now=new Date();const headers={'webhook-id':'event-1','webhook-timestamp':String(Math.floor(now.getTime()/1000)),'webhook-signature':w.sign('event-1',now,body)};expect(w.verify(body,headers)).toEqual({type:'enquiries.created'});expect(()=>w.verify('{}',headers)).toThrow();});
+ it('verifies signatures and rejects tampering',()=>{const w=new Webhook('whsec_'+btoa(String.fromCharCode(...new Uint8Array(32).fill(3))));const body=JSON.stringify({type:'enquiries.created'});const now=new Date();const headers={'webhook-id':'event-1','webhook-timestamp':String(Math.floor(now.getTime()/1000)),'webhook-signature':w.sign('event-1',now,body)};expect(w.verify(body,headers)).toEqual({type:'enquiries.created'});expect(()=>w.verify('{}',headers)).toThrow();});
  it('backs off retries with a one-hour cap',()=>{expect(retryDelay(1)).toBe(30);expect(retryDelay(8)).toBe(3600);});
 });
